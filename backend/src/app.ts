@@ -5,6 +5,10 @@ import { rateLimit } from 'express-rate-limit';
 import { env } from './config';
 import { authRouter } from './routes/auth';
 import { coursesRouter } from './routes/courses';
+import { announcementsRouter } from './routes/announcements';
+import { assignmentsRouter, courseAssignmentsRouter } from './routes/assignments';
+import { submissionsRouter } from './routes/submissions';
+import { commentsRouter } from './routes/comments';
 import { errorHandler, notFound } from './middleware/errors';
 
 export const app = express();
@@ -13,8 +17,12 @@ app.use(helmet());
 app.use(cors({ origin: env.CORS_ORIGIN.split(',').map((value) => value.trim()), credentials: false }));
 app.use(express.json({ limit: '100kb' }));
 app.use('/api/auth', rateLimit({ windowMs: 15 * 60 * 1000, limit: 50, standardHeaders: 'draft-8', legacyHeaders: false }), authRouter);
+app.use('/api/courses/:courseId/announcements', announcementsRouter);
+app.use('/api/courses/:courseId/assignments', courseAssignmentsRouter);
+app.use('/api/courses/:courseId/comments', commentsRouter);
 app.use('/api/courses', coursesRouter);
+app.use('/api/assignments', assignmentsRouter);
+app.use('/api/submissions', submissionsRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'eduroom-api' }));
 app.use(notFound);
 app.use(errorHandler);
-

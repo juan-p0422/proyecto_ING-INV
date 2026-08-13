@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config';
 
-type TokenPayload = { sub: string; email: string; role: 'STUDENT' | 'TEACHER' | 'ADMIN' };
+type TokenPayload = { sub: string; email: string; role: 'STUDENT' | 'TEACHER' };
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const [scheme, token] = req.headers.authorization?.split(' ') ?? [];
@@ -15,4 +15,3 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ message: 'Token inválido o expirado.' });
   }
 }
-
