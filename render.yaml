@@ -1,0 +1,42 @@
+databases:
+  - name: eduroom-db
+    databaseName: eduroom
+    user: eduroom
+    plan: free
+
+services:
+  - type: web
+    name: eduroom-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: eduroom-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGIN
+        value: https://eduroom-web.onrender.com
+      - key: NODE_ENV
+        value: production
+
+  - type: web
+    name: eduroom-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://eduroom-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
