@@ -75,12 +75,23 @@ Salvo registro y login, los endpoints requieren `Authorization: Bearer <token>`.
 | Entregas | `PATCH /api/submissions/:id/grade` | Docente propietario |
 | Comentarios | `GET /api/courses/:courseId/comments` | Integrante |
 | Comentarios | `POST /api/courses/:courseId/comments` | Integrante |
+| Seguridad | `GET /api/security/integrity` | Resumen público sin hashes ni rutas |
 
 `GET /comments` acepta `assignmentId` como query opcional. Las calificaciones se validan en el intervalo 0–100.
 
 ## Variables y seguridad
 
 Consulta [`.env.example`](.env.example). `JWT_SECRET` debe ser aleatorio y tener al menos 32 caracteres. `CORS_ORIGIN` acepta uno o varios orígenes separados por comas. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
+
+## Integridad y build educativo
+
+```bash
+npm run release:educational
+```
+
+El comando compila, ofusca el JavaScript propio del frontend, genera `integrity-manifest.json` y verifica SHA-256. También están disponibles `npm run integrity:generate` y `npm run integrity:verify`. La ofuscación no es cifrado y no sustituye autorización ni gestión de secretos.
+
+El backend verifica sus artefactos al arrancar cuando encuentra el manifest. `STRICT_INTEGRITY=true` bloquea el inicio ante una discrepancia; con `false` registra una advertencia. `INTEGRITY_MANIFEST_PATH` permite indicar una ubicación alternativa.
 
 ## Estructura
 

@@ -5,6 +5,7 @@ import { Layout } from '../components/Layout';
 import { Modal } from '../components/Modal';
 import { EmptyState, ErrorMessage, LoadingState, SuccessMessage } from '../components/StatusViews';
 import { api } from '../services/api';
+import { verifyClientIntegrity, type IntegrityState } from '../security/clientIntegrity';
 import type { Course } from '../types';
 import { errorMessage } from '../utils/format';
 
@@ -16,6 +17,7 @@ export function DashboardPage() {
   const [notice, setNotice] = useState('');
   const [dialog, setDialog] = useState<'create' | 'join' | null>(null);
   const [busy, setBusy] = useState(false);
+  const [integrity, setIntegrity] = useState<IntegrityState | 'checking'>('checking');
 
   const loadCourses = useCallback(async () => {
     setLoading(true);
@@ -26,6 +28,7 @@ export function DashboardPage() {
   }, []);
 
   useEffect(() => { void loadCourses(); }, [loadCourses]);
+  useEffect(() => { void verifyClientIntegrity().then(setIntegrity); }, []);
 
   async function submitCourse(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -54,6 +57,11 @@ export function DashboardPage() {
           {user?.role === 'TEACHER' ? <button className="button button-primary" onClick={() => { setNotice(''); setDialog('create'); }}><span>＋</span> Crear curso</button> : <button className="button button-primary" onClick={() => { setNotice(''); setDialog('join'); }}><span>＋</span> Unirme con código</button>}
         </div>
       </section>
+
+      <aside className={`integrity-panel integrity-${integrity}`} aria-live="polite">
+        <i aria-hidden="true" />
+        <div><strong>Integridad del sistema:</strong><span>{integrity === 'verified' ? 'verificada' : integrity === 'warning' ? 'advertencia' : integrity === 'checking' ? 'comprobando…' : 'no disponible'}</span></div>
+      </aside>
 
       <section className="courses-section" aria-labelledby="courses-title">
         <div className="section-heading"><div><p className="eyebrow">COLECCIÓN ACTIVA</p><h2 id="courses-title">Mis cursos</h2></div><span>{courses.length} {courses.length === 1 ? 'curso' : 'cursos'}</span></div>

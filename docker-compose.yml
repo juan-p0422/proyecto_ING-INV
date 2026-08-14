@@ -14,13 +14,16 @@ services:
       retries: 10
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       NODE_ENV: production
       PORT: 3000
       DATABASE_URL: postgresql://${POSTGRES_USER:-eduroom}:${POSTGRES_PASSWORD:-eduroom_local_password}@db:5432/${POSTGRES_DB:-eduroom}?schema=public
       JWT_SECRET: ${JWT_SECRET:-desarrollo_local_cambiar_antes_de_publicar_1234}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-8h}
+      STRICT_INTEGRITY: ${STRICT_INTEGRITY:-false}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
     ports:
       - "3000:3000"

@@ -1,10 +1,12 @@
-import { api, ApiError } from '../services/api';
+import { api } from '../services/api';
 
-export type IntegrityState = 'verified' | 'mismatch' | 'unavailable';
+export type IntegrityState = 'verified' | 'warning' | 'unavailable';
 
 type IntegrityResponse = {
-  valid: boolean;
-  buildId?: string;
+  status: IntegrityState;
+  checkedAt: string | null;
+  filesChecked: number;
+  modifiedFilesCount: number;
 };
 
 /**
@@ -13,17 +15,10 @@ type IntegrityResponse = {
  * alterarse y nunca sustituye autenticación, autorización ni controles del servidor.
  */
 export async function verifyClientIntegrity(): Promise<IntegrityState> {
-  const buildId = import.meta.env.VITE_BUILD_ID ?? 'development';
   try {
-    const result = await api<IntegrityResponse>('/security/integrity', {
-      method: 'POST',
-      body: JSON.stringify({ buildId, client: 'eduroom-web' }),
-    });
-    return result.valid ? 'verified' : 'mismatch';
-  } catch (error) {
-    if (error instanceof ApiError && (error.status === 404 || error.status === 501)) {
-      return 'unavailable';
-    }
+    const result = await api<IntegrityResponse>('/security/integrity');
+    return ['verified', 'warning', 'unavailable'].includes(result.status) ? result.status : 'unavailable';
+  } catch {
     return 'unavailable';
   }
 }

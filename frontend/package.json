@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:obfuscated": "npm run build && node scripts/obfuscate-build.cjs",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests"
   },
@@ -20,7 +21,7 @@
   "devDependencies": {
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "javascript-obfuscator": "^4.1.1",
     "vitest": "^3.1.2"
   }
 }
-

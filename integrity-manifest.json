@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "algorithm": "sha256",
+  "generatedAt": "2026-08-14T02:03:04.069Z",
+  "scopes": [
+    {
+      "root": "backend/dist",
+      "extensions": [
+        ".js"
+      ]
+    },
+    {
+      "root": "frontend/dist",
+      "extensions": [
+        ".js",
+        ".css",
+        ".html"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "backend/dist/prisma/seed.js",
+      "sha256": "fce86abffe0f50da00d9b1467bccbe8c4fa07b03e8b5d06f2d2dae0c73780c17",
+      "size": 4484
+    },
+    {
+      "path": "backend/dist/src/app.js",
+      "sha256": "9ab98eb97d47c93d21dac4401d25cffd5145aa24476de5f0d69f738fc64ebd1e",
+      "size": 2143
+    },
+    {
+      "path": "backend/dist/src/config.js",
+      "sha256": "8aed78c681bfc39fd4478dcfc6e10735e8aad2cbd7360a4e036d1428e9fc5d48",
+      "size": 839
+    },
+    {
+      "path": "backend/dist/src/lib/course-access.js",
+      "sha256": "7d1161fd7e652f9d866b0d701878b647e41bf977b3a85fd84b87277d3a4b5841",
+      "size": 1018
+    },
+    {
+      "path": "backend/dist/src/lib/http-error.js",
+      "sha256": "e613d68a00fdc718c343a8cf21735305823319792c063f923bafba848556d9ea",
+      "size": 310
+    },
+    {
+      "path": "backend/dist/src/lib/prisma.js",
+      "sha256": "38200de3cabe8388378be991772011d05c8ee63b647746753313a027306d22ef",
+      "size": 192
+    },
+    {
+      "path": "backend/dist/src/middleware/auth.js",
+      "sha256": "ccaeccaa808b6c0a46707b554cbfa72996faffa7486d7bd908f52a0a8e0fc4c4",
+      "size": 887
+    },
+    {
+      "path": "backend/dist/src/middleware/errors.js",
+      "sha256": "0ee87d582b5dab120dbe5309aa7845ae18b85516dc965992f027e8c145767f7a",
+      "size": 1117
+    },
+    {
+      "path": "backend/dist/src/routes/announcements.js",
+      "sha256": "f67bf16fa80a4dd28c37438520607b9c08dda3a2dbf3e830391f9ebd7800d223",
+      "size": 1898
+    },
+    {
+      "path": "backend/dist/src/routes/assignments.js",
+      "sha256": "7f2241c260cc37d5879c73b31954c2944c4c8c651f1498d34133cc00cebbf3ff",
+      "size": 4814
+    },
+    {
+      "path": "backend/dist/src/routes/auth.js",
+      "sha256": "8b93f3d08f8cafd7d3000f295e33f9e93e086bab09a1d463752a4e86e24124dd",
+      "size": 3102
+    },
+    {
+      "path": "backend/dist/src/routes/comments.js",
+      "sha256": "b422cca48386e59952099520e6dd1ef9e4b5cd6dcd9f943ccbdff67f354606ef",
+      "size": 2548
+    },
+    {
+      "path": "backend/dist/src/routes/courses.js",
+      "sha256": "5dcd87a66f57e0a869ee6672e11cde103639a01103431b4a5a5098d2726fe435",
+      "size": 4905
+    },
+    {
+      "path": "backend/dist/src/routes/submissions.js",
+      "sha256": "57e8f69d1a6f9e0909ed610457cbfc98a32d761551d934a44ebc496c8075b61c",
+      "size": 1627
+    },
+    {
+      "path": "backend/dist/src/security/antiDebug.js",
+      "sha256": "cfbd5fda4c98007dd52884a54c41719309d349c18d7e0b3032b776d007cba639",
+      "size": 1058
+    },
+    {
+      "path": "backend/dist/src/security/checksum.js",
+      "sha256": "4180db40164312fa86879c076488cb7d24dce50b379129e087a82a6561f3e2ce",
+      "size": 6278
+    },
+    {
+      "path": "backend/dist/src/server.js",
+      "sha256": "b963411ce0bf290ce72993b83b4f563c4770fe37db573e926eb50ac50e742b68",
+      "size": 1192
+    },
+    {
+      "path": "frontend/dist/assets/index-BPTkrxR7.css",
+      "sha256": "9b0ed5da665d5d4d6676a3f97ea10d18b9f916042fd74e270825ec1ecd552880",
+      "size": 25900
+    },
+    {
+      "path": "frontend/dist/assets/index-xgXpUvdx.js",
+      "sha256": "5fbe7cd0c7ea8cdbde23cc67a6d53da4a6603d827442cf8062c5cfda1abf2085",
+      "size": 572346
+    },
+    {
+      "path": "frontend/dist/index.html",
+      "sha256": "39122e505e90f126204eb22b683bb5baa5e581d57a7f02b6120219098edb8acb",
+      "size": 491
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import { assignmentsRouter, courseAssignmentsRouter } from './routes/assignments
 import { submissionsRouter } from './routes/submissions';
 import { commentsRouter } from './routes/comments';
 import { errorHandler, notFound } from './middleware/errors';
+import { getPublicIntegrityStatus } from './security/checksum';
 
 export const app = express();
 app.set('trust proxy', 1);
@@ -24,5 +25,6 @@ app.use('/api/courses', coursesRouter);
 app.use('/api/assignments', assignmentsRouter);
 app.use('/api/submissions', submissionsRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'eduroom-api' }));
+app.get('/api/security/integrity', (_req, res) => res.json(getPublicIntegrityStatus()));
 app.use(notFound);
 app.use(errorHandler);

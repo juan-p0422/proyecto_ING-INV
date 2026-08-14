@@ -58,13 +58,16 @@ La estrategia de EduRoom busca demostrar capas realistas sin presentar la ofusca
 1. **Separación de responsabilidades.** Toda autorización y acceso a datos se decide en Express; React solo representa el resultado.
 2. **Gestión de configuración.** El frontend recibe únicamente `VITE_API_URL`. Secretos, `DATABASE_URL` y `JWT_SECRET` permanecen en el backend.
 3. **Build de producción.** Vite agrupa y minifica React mediante `npm --prefix frontend run build`.
-4. **Mapas de fuentes.** No se publican por defecto. Si se requieren para monitoreo, se almacenarán de forma privada y asociados al commit.
-5. **Contenedores multietapa.** La imagen final del frontend contiene archivos estáticos y Nginx; la del backend omite dependencias de desarrollo.
-6. **Integridad.** Se genera un manifiesto SHA-256 de la entrega y se registra el hash del commit.
-7. **Configuración HTTP.** El backend usa encabezados defensivos mediante Helmet y limita cuerpos y solicitudes de autenticación.
-8. **Comprobación.** Se inspecciona el bundle para confirmar que no contenga secretos, rutas locales, credenciales ni datos de prueba sensibles.
+4. **Build ofuscado opcional.** `npm --prefix frontend run build:obfuscated` procesa únicamente los archivos `.js` generados con `javascript-obfuscator`.
+5. **Mapas de fuentes.** No se publican por defecto. Si se requieren para monitoreo, se almacenarán de forma privada y asociados al commit.
+6. **Contenedores multietapa.** La imagen final del frontend contiene archivos estáticos y Nginx; la del backend omite dependencias de desarrollo.
+7. **Integridad.** Se genera `integrity-manifest.json` después de la última transformación y se verifica mediante SHA-256.
+8. **Configuración HTTP.** El backend usa encabezados defensivos mediante Helmet y limita cuerpos y solicitudes de autenticación.
+9. **Comprobación.** Se inspecciona el bundle para confirmar que no contenga secretos, rutas locales, credenciales ni datos de prueba sensibles.
 
-No se añade una transformación de ofuscación propietaria en la versión inicial. Para una práctica académica futura podría evaluarse una herramienta sobre una copia del build propio, comparando tamaño, rendimiento, depurabilidad y resistencia a lectura; nunca se aplicaría al código de terceros.
+La configuración implementada usa transformaciones moderadas: compactación, nombres hexadecimales y codificación Base64 de parte del arreglo de cadenas. Evita a propósito inyección de código muerto, aplanamiento de flujo y autodefensa, porque añaden coste y fragilidad. Una semilla fija hace reproducible la demostración.
+
+Esta transformación **no es cifrado real**. El navegador recibe código ejecutable y una persona puede estudiarlo o reconstruirlo. Su finalidad es comparar artefactos, enseñar costes de legibilidad y reducir exposición casual; nunca se aplica a código de terceros.
 
 ## 9.6 Procedimiento de verificación
 
@@ -74,12 +77,15 @@ No se añade una transformación de ofuscación propietaria en la versión inici
 4. Ejecutar la aplicación contra la API propia y confirmar que alterar el estado local del cliente no concede permisos en el servidor.
 5. Revisar encabezados HTTP, tamaño del bundle y ausencia de mapas de fuentes públicos.
 6. Generar el manifiesto SHA-256 y conservar la evidencia de compilación.
+7. Ejecutar `npm run integrity:verify` y comprobar el estado resumido del dashboard.
 
 > **Espacio de evidencia EV-09-01:** variables configuradas mostrando solo nombres y origen, sin valores.
 
 > **Espacio de evidencia EV-09-02:** salida del build de producción, tamaño de artefactos y ausencia de mapas públicos.
 
 > **Espacio de evidencia EV-09-03:** prueba sobre EduRoom donde una acción sin autorización sea rechazada por el backend.
+
+> **Espacio de evidencia EV-09-04:** comparación reproducible de tamaños normal/ofuscado y verificación posterior del manifest.
 
 ## 9.7 Limitaciones reales
 

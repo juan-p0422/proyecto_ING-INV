@@ -5,6 +5,10 @@
   "scripts": {
     "install:all": "npm --prefix backend install && npm --prefix frontend install",
     "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "build:obfuscated": "npm --prefix backend run build && npm --prefix frontend run build:obfuscated",
+    "integrity:generate": "node scripts/generate-checksum.js",
+    "integrity:verify": "node scripts/verify-integrity.js",
+    "release:educational": "npm run build:obfuscated && npm run integrity:generate && npm run integrity:verify",
     "test": "npm --prefix backend test && npm --prefix frontend test",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev"
@@ -13,4 +17,3 @@
     "node": ">=20"
   }
 }
-
