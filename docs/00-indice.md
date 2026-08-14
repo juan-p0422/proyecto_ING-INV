@@ -19,6 +19,8 @@ Esta memoria registra un ejercicio académico de ingeniería inversa ética de c
 | [09](09-cifrado-ofuscacion.md) | Cifrado, hash y ofuscación | Base redactada |
 | [10](10-despliegue-render.md) | Despliegue en Render | Configuración lista |
 | [11](11-conclusiones.md) | Hallazgos, límites y trabajo futuro | Borrador |
+| [12](12-guion-presentacion.md) | Guion para exposición y demostración presencial | Listo |
+| [13](13-evidencias.md) | Checklist y fichas de evidencia | Listo |
 
 ## Convenciones de evidencia
 
@@ -29,4 +31,3 @@ Cada evidencia deberá nombrarse `EV-<capítulo>-<número>`, indicar fecha y hor
 ## Declaración de alcance
 
 No se realiza scraping masivo, evasión de autenticación, explotación, descompilación, desensamblado, extracción de código ni acceso a información ajena. La observación se limita a interfaces públicas, documentación disponible y solicitudes legítimas producidas por la cuenta de prueba del investigador.
-

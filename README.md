@@ -32,7 +32,7 @@ docker compose exec backend npm run prisma:seed
 Abre `http://localhost:3000`. Express entrega la aplicación React y la API bajo `/api` desde el mismo contenedor. La primera ejecución espera a PostgreSQL, aplica `prisma migrate deploy` y después inicia el servidor. La respuesta de salud esperada es:
 
 ```json
-{"status":"ok","service":"eduroom-api"}
+{"status":"ok","uptime":12.345,"timestamp":"2026-08-13T20:00:00.000Z","environment":"production"}
 ```
 
 Compose incluye valores de demostración para arrancar sin configuración adicional. Para personalizarlos, copia `.env.example` como `.env`, cambia las claves locales y vuelve a crear los contenedores. El archivo `.env` está ignorado por Git y no debe confirmarse.
@@ -53,12 +53,18 @@ docker build -f backend/Dockerfile --build-arg VITE_API_URL=/api -t eduroom:loca
 
 El Dockerfile usa etapas separadas para instalar y compilar Vite, generar Prisma, compilar TypeScript y crear una imagen de ejecución con dependencias de producción. Su comando final ejecuta `npm run start:prod`, que aplica las migraciones pendientes antes de `npm start`.
 
-El seed crea dos cuentas locales con la contraseña `Demo1234!`:
+## Credenciales demo
 
-- `docente@eduroom.local`
-- `estudiante@eduroom.local`
+Después de ejecutar `docker compose exec backend npm run prisma:seed`, quedan disponibles:
 
-Estas credenciales son únicamente para desarrollo y no deben cargarse en un entorno público.
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Profesor | `teacher@eduroom.local` | `Teacher123!` |
+| Estudiante | `student@eduroom.local` | `Student123!` |
+
+El seed también crea el curso `Diseño de experiencias educativas`, código `AULA2026`, un anuncio, una tarea, una inscripción, una entrega pendiente y un comentario. Es idempotente: puede repetirse para restaurar el escenario antes de una presentación.
+
+Estas credenciales son exclusivamente locales y no deben cargarse en un entorno público.
 
 ## Desarrollo sin Docker
 
@@ -163,6 +169,8 @@ scripts/   preparación y manifiesto SHA-256
 ```
 
 La derivación conceptual del modelo se documenta en [`docs/05-reconstruccion-estructuras.md`](docs/05-reconstruccion-estructuras.md). El despliegue declarativo está en [`render.yaml`](render.yaml) y su procedimiento en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+
+Para la exposición consulta [`docs/12-guion-presentacion.md`](docs/12-guion-presentacion.md) y completa [`docs/13-evidencias.md`](docs/13-evidencias.md).
 
 ## Despliegue en Render
 

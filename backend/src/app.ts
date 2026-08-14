@@ -31,7 +31,12 @@ app.use('/api/courses/:courseId/comments', commentsRouter);
 app.use('/api/courses', coursesRouter);
 app.use('/api/assignments', assignmentsRouter);
 app.use('/api/submissions', submissionsRouter);
-app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'eduroom-api' }));
+app.get('/api/health', (_req, res) => res.json({
+  status: 'ok',
+  uptime: Number(process.uptime().toFixed(3)),
+  timestamp: new Date().toISOString(),
+  environment: env.NODE_ENV,
+}));
 app.use('/api/security', securityRouter);
 
 if (env.NODE_ENV === 'production') {

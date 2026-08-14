@@ -1,7 +1,7 @@
 {
   "version": 1,
   "algorithm": "sha256",
-  "generatedAt": "2026-08-14T02:33:21.770Z",
+  "generatedAt": "2026-08-14T02:59:27.649Z",
   "scopes": [
     {
       "root": "backend/dist",
@@ -21,13 +21,13 @@
   "files": [
     {
       "path": "backend/dist/prisma/seed.js",
-      "sha256": "fce86abffe0f50da00d9b1467bccbe8c4fa07b03e8b5d06f2d2dae0c73780c17",
-      "size": 4484
+      "sha256": "4de5aaacc8bcbbecaebcf617dabaabbee982cec71f0d086956eba54205cefdd1",
+      "size": 5642
     },
     {
       "path": "backend/dist/src/app.js",
-      "sha256": "f2db3cb3a21ef63d520cb07d4e9b8548ecb2b6e761ce42bd8b05736389873ddd",
-      "size": 3235
+      "sha256": "8cbadfb97ce41faa3e3467b2c42b0a7d99dcc63b8703d081ccbd12320bc9075f",
+      "size": 3346
     },
     {
       "path": "backend/dist/src/config.js",
@@ -121,8 +121,8 @@
     },
     {
       "path": "frontend/dist/assets/index-xgXpUvdx.js",
-      "sha256": "cd2fae13d22d14902d8360818cdd1f46e4edfb0197b8a024079f554f2b493e7e",
-      "size": 265225
+      "sha256": "5fbe7cd0c7ea8cdbde23cc67a6d53da4a6603d827442cf8062c5cfda1abf2085",
+      "size": 572346
     },
     {
       "path": "frontend/dist/index.html",
