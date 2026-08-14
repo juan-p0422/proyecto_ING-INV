@@ -1,16 +1,22 @@
 # EduRoom
 
-EduRoom es una réplica académica y original de funciones generales de un LMS. Se construyó mediante ingeniería inversa ética de caja negra: observación de interfaces y flujos, documentación pública y tráfico generado por una cuenta propia de prueba. No contiene marcas, código, recursos visuales ni datos propietarios de Google.
+EduRoom es una implementación académica y original de funciones generales de un LMS. Su diseño procede de ingeniería inversa ética de caja negra: observación de interfaces y flujos, documentación pública y tráfico generado por una cuenta propia de prueba. No contiene código, recursos visuales, credenciales ni datos propietarios de Google.
 
-## Alcance de esta primera versión
+## Funcionalidades
 
-- Registro e inicio de sesión con JWT y contraseñas protegidas con bcrypt.
-- Roles de estudiante, docente y administrador.
-- Creación de cursos para docentes y unión mediante código.
-- Panel adaptable para consultar cursos y participantes.
-- API REST en Express/TypeScript y PostgreSQL mediante Prisma.
-- Ejecución local con Docker Compose y despliegue declarativo en Render.
-- Reporte académico base en [`docs/00-indice.md`](docs/00-indice.md).
+- Registro, login, consulta de sesión y JWT con contraseñas protegidas mediante bcrypt.
+- Roles globales `TEACHER` y `STUDENT`, además de rol local por inscripción.
+- Cursos con docente propietario, código de acceso y listado de integrantes.
+- Anuncios, tareas con fecha límite, entregas, calificación y retroalimentación.
+- Comentarios generales del curso o asociados a una tarea.
+- Modelo de adjuntos relacionado con cursos, tareas y entregas.
+- Validación de entradas con Zod, CORS configurable, Helmet y límite de solicitudes de autenticación.
+
+El backend no devuelve `passwordHash`. Un docente solo puede crear contenido y calificar dentro de los cursos que posee; un estudiante solo puede entregar en cursos donde está inscrito como estudiante.
+
+## Stack
+
+Node.js 20+, Express, TypeScript, Prisma, PostgreSQL, JWT, bcrypt y Zod. El cliente incluido usa React/Vite.
 
 ## Inicio rápido con Docker
 
@@ -18,41 +24,75 @@ Requisitos: Docker Desktop y Docker Compose.
 
 ```bash
 docker compose up --build
+docker compose exec backend npm run prisma:seed
 ```
 
-Abre `http://localhost:5173`. La API responde en `http://localhost:3000/api/health`. Para cargar la cuenta docente de demostración:
+Abre `http://localhost:5173`. La API responde en `http://localhost:3000/api/health`.
 
-```bash
-docker compose exec backend npm run db:seed
-```
+El seed crea dos cuentas locales con la contraseña `Demo1234!`:
 
-Credenciales: `docente@eduroom.local` / `Demo1234!`. Son únicamente datos locales y deben cambiarse o eliminarse en otros entornos.
+- `docente@eduroom.local`
+- `estudiante@eduroom.local`
+
+Estas credenciales son únicamente para desarrollo y no deben cargarse en un entorno público.
 
 ## Desarrollo sin Docker
 
 1. Ejecuta `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1`.
-2. Configura PostgreSQL y ajusta `backend/.env`.
-3. Ejecuta `npm --prefix backend run db:migrate`.
-4. En terminales separadas ejecuta `npm run dev:backend` y `npm run dev:frontend`.
+2. Configura PostgreSQL y ajusta `backend/.env` a partir de `backend/.env.example`.
+3. Ejecuta `npm --prefix backend run prisma:migrate`.
+4. Opcionalmente carga datos con `npm --prefix backend run prisma:seed`.
+5. Inicia API y cliente en terminales separadas con `npm run dev:backend` y `npm run dev:frontend`.
+
+Para validar un build completo:
+
+```bash
+npm run build
+```
+
+Los scripts principales del backend son `dev`, `build`, `start`, `prisma:migrate` y `prisma:seed`. También se conservan alias `db:*` para los flujos de Docker existentes.
+
+## API
+
+Salvo registro y login, los endpoints requieren `Authorization: Bearer <token>`.
+
+| Área | Método y ruta | Acceso |
+|---|---|---|
+| Auth | `POST /api/auth/register` | Público; `role` opcional (`STUDENT` por defecto) |
+| Auth | `POST /api/auth/login` | Público |
+| Auth | `GET /api/auth/me` | Autenticado |
+| Cursos | `GET /api/courses` | Cursos del usuario |
+| Cursos | `POST /api/courses` | Docente |
+| Cursos | `GET /api/courses/:id` | Integrante |
+| Cursos | `POST /api/courses/join` | Autenticado, mediante `code` |
+| Cursos | `GET /api/courses/:id/members` | Integrante |
+| Anuncios | `GET /api/courses/:courseId/announcements` | Integrante |
+| Anuncios | `POST /api/courses/:courseId/announcements` | Docente propietario |
+| Tareas | `GET /api/courses/:courseId/assignments` | Integrante |
+| Tareas | `POST /api/courses/:courseId/assignments` | Docente propietario |
+| Tareas | `GET /api/assignments/:id` | Integrante; entregas filtradas por rol |
+| Entregas | `POST /api/assignments/:id/submit` | Estudiante inscrito |
+| Entregas | `PATCH /api/submissions/:id/grade` | Docente propietario |
+| Comentarios | `GET /api/courses/:courseId/comments` | Integrante |
+| Comentarios | `POST /api/courses/:courseId/comments` | Integrante |
+
+`GET /comments` acepta `assignmentId` como query opcional. Las calificaciones se validan en el intervalo 0–100.
 
 ## Variables y seguridad
 
-Consulta [`.env.example`](.env.example). `JWT_SECRET` debe ser aleatorio y tener al menos 32 caracteres. Nunca confirmes archivos `.env`. En producción restringe `CORS_ORIGIN` al dominio real del frontend, usa HTTPS y gestiona secretos desde la plataforma.
+Consulta [`.env.example`](.env.example). `JWT_SECRET` debe ser aleatorio y tener al menos 32 caracteres. `CORS_ORIGIN` acepta uno o varios orígenes separados por comas. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
 
 ## Estructura
 
 ```text
-backend/   API, modelo Prisma y migraciones
+backend/   API, esquema Prisma, migraciones y seed
 frontend/  cliente React/Vite
 docs/      memoria académica y protocolo ético
 scripts/   preparación y manifiesto SHA-256
 ```
 
-## Render
-
-El archivo [`render.yaml`](render.yaml) crea PostgreSQL, la API y el sitio estático. Si Render asigna nombres de host distintos, actualiza `VITE_API_URL` y `CORS_ORIGIN` en el panel y vuelve a desplegar. El procedimiento completo está en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+La derivación conceptual del modelo se documenta en [`docs/05-reconstruccion-estructuras.md`](docs/05-reconstruccion-estructuras.md). El despliegue declarativo está en [`render.yaml`](render.yaml) y su procedimiento en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
 
 ## Aviso académico
 
-Este repositorio documenta una reconstrucción conceptual. Las afirmaciones sobre el sistema observado deben acompañarse de fecha, entorno, evidencia anonimizada y nivel de certeza. Está prohibido incorporar credenciales, tokens, datos de terceros o capturas con información personal.
-
+Las entidades de EduRoom son una reconstrucción conceptual propia, no una afirmación sobre la implementación interna de Google Classroom. Las observaciones deben acompañarse de fecha, entorno, evidencia anonimizada y nivel de certeza. Está prohibido incorporar credenciales, tokens, datos de terceros o capturas con información personal.
