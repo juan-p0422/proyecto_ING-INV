@@ -135,13 +135,13 @@ El servicio usa estos comandos declarados:
 
 ```bash
 # Build
-npm ci --prefix backend && npm ci --prefix frontend && npm --prefix backend run db:generate && npm run build
+npm ci --include=dev --prefix backend && npm ci --include=dev --prefix frontend && npm run build
 
 # Start
 npm --prefix backend run start:prod
 ```
 
-El build ejecuta explícitamente `prisma generate`; `npm run build` compila TypeScript y Vite. El start aplica solo migraciones ya versionadas mediante `prisma migrate deploy`: no usa `prisma migrate dev` ni crea migraciones en producción.
+`--include=dev` es obligatorio durante el build porque `NODE_ENV=production` hace que npm omita normalmente las dependencias de desarrollo. TypeScript, Vite, `@types/node` y `@types/express` son herramientas de compilación y deben estar presentes en esta fase. El script raíz `npm run build` ejecuta `prisma generate` y compila TypeScript y Vite. El start aplica solo migraciones ya versionadas mediante `prisma migrate deploy`: no usa `prisma migrate dev` ni crea migraciones en producción.
 
 ## Variables en Render
 
@@ -169,6 +169,7 @@ El build ejecuta explícitamente `prisma generate`; `npm run build` compila Type
 
 ## Solución de problemas
 
+- **TypeScript no encuentra `express`, `process`, `Buffer` o `node:*`:** confirma que ambos `npm ci` del Build Command incluyan `--include=dev`. Después ejecuta **Clear build cache & deploy** para eliminar una instalación incompleta almacenada por Render.
 - **El build de Vite apunta a otra API:** confirma que `VITE_API_URL=/api` estaba presente durante el build y solicita un redeploy con limpieza de caché.
 - **La aplicación inicia antes de tener tablas:** confirma que el Start Command sea `npm --prefix backend run start:prod` y revisa el resultado de `prisma migrate deploy`.
 - **Render no detecta el puerto:** no fijes un puerto distinto; el servidor ya escucha `process.env.PORT` en `0.0.0.0`.
