@@ -1,7 +1,7 @@
 {
   "version": 1,
   "algorithm": "sha256",
-  "generatedAt": "2026-08-14T02:59:27.649Z",
+  "generatedAt": "2026-08-14T03:13:43.110Z",
   "scopes": [
     {
       "root": "backend/dist",
@@ -26,8 +26,8 @@
     },
     {
       "path": "backend/dist/src/app.js",
-      "sha256": "8cbadfb97ce41faa3e3467b2c42b0a7d99dcc63b8703d081ccbd12320bc9075f",
-      "size": 3346
+      "sha256": "10012127754c56ec664ebaa694cb8d8e7a1a2c15c1b5643cebe805473429f647",
+      "size": 3374
     },
     {
       "path": "backend/dist/src/config.js",
@@ -101,8 +101,8 @@
     },
     {
       "path": "backend/dist/src/security/checksum.js",
-      "sha256": "4180db40164312fa86879c076488cb7d24dce50b379129e087a82a6561f3e2ce",
-      "size": 6278
+      "sha256": "de60873549426f4c3a9606f73f7eefd9d062b7ce0cb1f70370f3e79b7ea6e3e7",
+      "size": 6566
     },
     {
       "path": "backend/dist/src/security/crypto.js",
@@ -115,18 +115,18 @@
       "size": 1192
     },
     {
-      "path": "frontend/dist/assets/index-BPTkrxR7.css",
-      "sha256": "9b0ed5da665d5d4d6676a3f97ea10d18b9f916042fd74e270825ec1ecd552880",
-      "size": 25900
-    },
-    {
-      "path": "frontend/dist/assets/index-xgXpUvdx.js",
+      "path": "frontend/dist/assets/index-BmPgmr7d.js",
       "sha256": "5fbe7cd0c7ea8cdbde23cc67a6d53da4a6603d827442cf8062c5cfda1abf2085",
       "size": 572346
     },
     {
+      "path": "frontend/dist/assets/index-CTW-61AM.css",
+      "sha256": "5abe1078d8cfa7ba4db469b50edffec994f216881caf8f8b99cb90a42f3fb05f",
+      "size": 25794
+    },
+    {
       "path": "frontend/dist/index.html",
-      "sha256": "39122e505e90f126204eb22b683bb5baa5e581d57a7f02b6120219098edb8acb",
+      "sha256": "bfa8c0df9640cffb65eb52a30437142f6b0fa3fece20b527fd9eb72bfdb05942",
       "size": 491
     }
   ]

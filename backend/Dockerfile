@@ -13,7 +13,7 @@ FROM node:20-alpine AS backend-build
 WORKDIR /workspace/backend
 COPY backend/package*.json ./
 RUN npm ci
-COPY backend/tsconfig.json ./
+COPY backend/tsconfig.json backend/prisma.config.ts ./
 COPY backend/prisma ./prisma
 COPY backend/src ./src
 RUN npx prisma generate
@@ -24,6 +24,7 @@ WORKDIR /workspace/backend
 ENV NODE_ENV=production
 COPY backend/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
+COPY backend/prisma.config.ts ./
 COPY --from=backend-build /workspace/backend/dist ./dist
 COPY --from=backend-build /workspace/backend/prisma ./prisma
 COPY --from=backend-build /workspace/backend/node_modules/.prisma ./node_modules/.prisma

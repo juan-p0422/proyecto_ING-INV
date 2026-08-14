@@ -32,7 +32,7 @@ docker compose exec backend npm run prisma:seed
 Abre `http://localhost:3000`. Express entrega la aplicación React y la API bajo `/api` desde el mismo contenedor. La primera ejecución espera a PostgreSQL, aplica `prisma migrate deploy` y después inicia el servidor. La respuesta de salud esperada es:
 
 ```json
-{"status":"ok","uptime":12.345,"timestamp":"2026-08-13T20:00:00.000Z","environment":"production"}
+{"status":"ok","service":"eduroom-api","uptime":12.345,"timestamp":"2026-08-13T20:00:00.000Z","environment":"production"}
 ```
 
 Compose incluye valores de demostración para arrancar sin configuración adicional. Para personalizarlos, copia `.env.example` como `.env`, cambia las claves locales y vuelve a crear los contenedores. El archivo `.env` está ignorado por Git y no debe confirmarse.
@@ -79,7 +79,10 @@ Para validar un build completo:
 
 ```bash
 npm run build
+npm test
 ```
+
+Ambos comandos deben finalizar con código `0`. El build valida TypeScript y genera los artefactos de producción; las pruebas cubren cifrado autenticado, manipulación de ciphertext, healthcheck y entrega de la SPA sin confundir rutas `/api` con rutas del frontend.
 
 Los scripts principales del backend son `dev`, `build`, `start`, `start:prod`, `prisma:migrate` y `prisma:seed`. También se conservan alias `db:*` para los flujos de Docker y Render.
 
@@ -129,6 +132,16 @@ Consulta [`.env.example`](.env.example). Las variables principales son:
 
 `JWT_EXPIRES_IN` e `INTEGRITY_MANIFEST_PATH` son opcionales. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
 
+Antes de entregar, verifica que solo estén versionadas las plantillas públicas:
+
+```bash
+git ls-files | grep -E '(^|/)\.env($|\.)'
+```
+
+En PowerShell, el equivalente es `git ls-files | Select-String '(^|/)\.env($|\.)'`.
+
+La salida esperada contiene únicamente `.env.example`, `backend/.env.example` y `frontend/.env.example`; nunca una ruta terminada exactamente en `.env` ni variantes privadas como `.env.local`.
+
 Genera una clave de cifrado de 32 bytes con Node.js:
 
 ```bash
@@ -157,7 +170,7 @@ npm run release:educational
 
 El comando compila, ofusca el JavaScript propio del frontend, genera `integrity-manifest.json` y verifica SHA-256. También están disponibles `npm run integrity:generate` y `npm run integrity:verify`. La ofuscación no es cifrado y no sustituye autorización ni gestión de secretos.
 
-El backend verifica sus artefactos al arrancar cuando encuentra el manifest. `STRICT_INTEGRITY=true` bloquea el inicio ante una discrepancia; con `false` registra una advertencia. `INTEGRITY_MANIFEST_PATH` permite indicar una ubicación alternativa.
+El backend verifica sus artefactos antes de abrir el puerto. `STRICT_INTEGRITY=true` bloquea el inicio ante una discrepancia, un manifiesto inválido o ausente; con `false` registra una advertencia o estado no disponible. `INTEGRITY_MANIFEST_PATH` permite indicar una ubicación alternativa.
 
 ## Estructura
 
@@ -172,11 +185,23 @@ La derivación conceptual del modelo se documenta en [`docs/05-reconstruccion-es
 
 Para la exposición consulta [`docs/12-guion-presentacion.md`](docs/12-guion-presentacion.md) y completa [`docs/13-evidencias.md`](docs/13-evidencias.md).
 
+El índice completo de la memoria y la correspondencia con los requisitos del examen están en [`docs/00-indice.md`](docs/00-indice.md).
+
 ## Despliegue en Render
 
 `render.yaml` crea PostgreSQL y un único servicio web Node. El build instala ambos paquetes, ejecuta `prisma generate` y compila backend y frontend; el arranque ejecuta `prisma migrate deploy` antes de iniciar Express. En Render selecciona **New > Blueprint**, conecta el repositorio y aplica el archivo de la raíz. Los secretos se generan sin quedar escritos en el repositorio.
 
 Después del despliegue valida `https://<servicio>.onrender.com/api/health` y abre la misma URL sin `/api/health` para probar la SPA. El procedimiento completo, la lista de variables y la solución de problemas están en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+
+## Limitaciones éticas y técnicas
+
+- El análisis descrito es de caja negra, manual y limitado a información pública, interfaces visibles y acciones realizadas con cuentas y datos de prueba autorizados. No incluye evasión de autenticación, explotación, scraping masivo, descompilación, extracción de código ni acceso a datos de terceros.
+- Las entidades reconstruidas son inferencias conceptuales para EduRoom; no revelan ni pretenden describir la arquitectura, base de datos o código internos de Google Classroom.
+- EduRoom no usa logos, iconos, tipografías remotas, capturas incorporadas, paletas de marca ni otros assets de Google. Las referencias textuales se conservan solo para identificar el objeto académico del análisis y citar documentación pública.
+- El JWT se guarda en `localStorage` por simplicidad del prototipo; una aplicación productiva debería evaluar cookies `HttpOnly`, protección CSRF, revocación y renovación de sesión.
+- Los adjuntos están reconstruidos en el modelo de datos, pero no existe carga binaria ni almacenamiento de archivos. Tampoco se implementan recuperación de cuenta, notificaciones, auditoría completa, rúbricas, rotación de claves o KMS.
+- SHA-256 detecta cambios respecto de un manifiesto confiable, pero no autentica por sí solo al autor. La ofuscación solo eleva el esfuerzo de lectura y AES-GCM protege las notas seguras seleccionadas, no todo el sistema ni el código entregado al navegador.
+- El seed contiene credenciales conocidas y datos sintéticos: es exclusivo para desarrollo y demostraciones locales, no para un despliegue público.
 
 ## Aviso académico
 

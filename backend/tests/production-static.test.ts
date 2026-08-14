@@ -35,7 +35,11 @@ describe('servidor full-stack de producción', () => {
   it('mantiene disponible el healthcheck de la API', async () => {
     const response = await fetch(`${origin}/api/health`);
     expect(response.status).toBe(200);
-    await expect(response.json()).resolves.toEqual({ status: 'ok', service: 'eduroom-api' });
+    await expect(response.json()).resolves.toEqual(expect.objectContaining({
+      status: 'ok',
+      service: 'eduroom-api',
+      environment: 'production',
+    }));
   });
 
   it.each(['/', '/courses/demo'])('sirve index.html para %s', async (route) => {

@@ -60,7 +60,7 @@ La interfaz se adapta a escritorio, tableta y móvil mediante cuadrículas fluid
 
 ### Integridad conceptual del cliente
 
-`frontend/src/security/clientIntegrity.ts` envía `VITE_BUILD_ID` a `POST /api/security/integrity`. Si el servidor implementa el contrato, puede indicar si el identificador corresponde a un build reconocido; si el endpoint no existe, la interfaz informa “sin endpoint” y continúa funcionando.
+`frontend/src/security/clientIntegrity.ts` consulta `GET /api/security/integrity`. El servidor responde con el resultado resumido de la comprobación SHA-256 realizada durante el arranque: estado, fecha, cantidad de archivos comprobados y número de discrepancias. No expone hashes ni rutas internas. Si la consulta falla, la interfaz presenta el estado “no disponible” y continúa funcionando.
 
 Esta comprobación es exclusivamente educativa: cualquier lógica ejecutada en el navegador puede inspeccionarse o alterarse. No sustituye validación de entradas, autenticación, autorización, controles de acceso, TLS, gestión segura de secretos ni verificación del lado servidor.
 

@@ -37,7 +37,7 @@ Se excluyen `.git`, `node_modules`, temporales y extensiones fuera del alcance. 
 |---|---|---|
 | Manifest válido y archivos iguales | Arranca como `verified` | Arranca como `verified` |
 | Archivo modificado, faltante o nuevo | Registra advertencia y arranca | Impide el arranque |
-| Manifest ausente | Informa `unavailable` y arranca | Informa `unavailable` y arranca, porque la comprobación solo se activa si existe manifest |
+| Manifest ausente | Informa `unavailable` y arranca | Impide el arranque; el modo estricto exige evidencia verificable |
 | Manifest inválido | Registra advertencia y arranca | Impide el arranque |
 
 La variable opcional `INTEGRITY_MANIFEST_PATH` permite indicar otra ubicación. Si se omite, el backend busca el manifest en ubicaciones compatibles con desarrollo y contenedor.

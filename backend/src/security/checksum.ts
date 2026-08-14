@@ -90,6 +90,9 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
   if (!locatedManifest) {
     latestReport = { ...latestReport, status: 'unavailable', checkedAt, manifestFound: false };
     console.warn('[integrity] Manifest no encontrado; verificación no disponible.');
+    if (options.strict) {
+      throw new Error('STRICT_INTEGRITY requires an integrity manifest before startup.');
+    }
     return latestReport;
   }
 
@@ -128,13 +131,14 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
     };
 
     if (latestReport.status === 'verified') console.info(`[integrity] ${filesChecked} archivos del backend verificados.`);
+    else if (expectedEntries.length === 0) console.warn('[integrity] El manifiesto no contiene artefactos verificables del backend.');
     else console.warn(`[integrity] Advertencia: ${modifiedFilesCount} discrepancias en artefactos del backend.`);
   } catch (error) {
     latestReport = { ...latestReport, status: 'warning', checkedAt, manifestFound: true, modifiedFilesCount: Math.max(1, latestReport.modifiedFilesCount) };
     console.warn(`[integrity] No fue posible completar la verificación: ${error instanceof Error ? error.message : 'error desconocido'}`);
   }
 
-  if (options.strict && latestReport.status === 'warning') {
+  if (options.strict && latestReport.status !== 'verified') {
     throw new Error('STRICT_INTEGRITY impidió el arranque por una discrepancia de integridad.');
   }
   return latestReport;
@@ -144,4 +148,3 @@ export function getPublicIntegrityStatus() {
   const { status, checkedAt, filesChecked, modifiedFilesCount } = latestReport;
   return { status, checkedAt, filesChecked, modifiedFilesCount };
 }
-

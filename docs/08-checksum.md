@@ -40,7 +40,7 @@ El repositorio utiliza dos manifestaciones complementarias de SHA-256:
 - `scripts/verify-integrity.js` para comparación automatizada.
 - `integrity-manifest.json` como manifest JSON consumido por el backend.
 
-`docs/checksums.sha256` documenta la entrega de fuentes y excluye artefactos regenerables. `integrity-manifest.json` protege específicamente `backend/dist/**/*.js` y `frontend/dist/**/*.{js,css,html}`. Ambos excluyen `.git`, `node_modules` y temporales.
+`docs/checksums.sha256` documenta la entrega de fuentes y excluye artefactos regenerables. `integrity-manifest.json` protege específicamente `backend/dist/**/*.js` y `frontend/dist/**/*.{js,css,html}`. Ambos excluyen `.git`, `node_modules` y temporales. Los scripts de fuentes también excluyen `.env` y variantes privadas como `.env.local`, pero conservan los archivos públicos `.env.example`.
 
 Para una entrega académica se generan después de compilar, probar y congelar la versión. Se registran además el commit, la fecha UTC y las versiones de las herramientas.
 
@@ -94,7 +94,7 @@ npm run integrity:verify
 
 El resultado válido muestra el número total de archivos coincidentes. Si falla, no debe regenerarse el manifest hasta confirmar que el cambio es autorizado. En producción, el backend repite la comparación de sus archivos JavaScript antes de escuchar conexiones.
 
-Con `STRICT_INTEGRITY=false`, una discrepancia se registra y el servicio continúa con estado `warning`. Con `STRICT_INTEGRITY=true`, una discrepancia o manifest inválido impide el arranque. Si el manifest no existe, el estado es `unavailable` porque la integración solo verifica cuando está presente.
+Con `STRICT_INTEGRITY=false`, una discrepancia se registra y el servicio continúa con estado `warning`; si falta el manifest, informa `unavailable`. Con `STRICT_INTEGRITY=true`, una discrepancia, un manifest inválido o su ausencia impiden el arranque. De este modo, el modo estricto nunca ejecuta la aplicación sin una comprobación satisfactoria.
 
 ### Verificación completa en GNU/Linux
 

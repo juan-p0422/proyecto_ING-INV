@@ -3,7 +3,10 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $destination = Join-Path $root $Output
 $files = Get-ChildItem $root -Recurse -File | Where-Object {
-  $_.FullName -notmatch '[\\/](node_modules|dist|\.git)[\\/]' -and $_.FullName -ne $destination
+  $privateEnvironmentFile = $_.Name -eq '.env' -or ($_.Name -like '.env.*' -and $_.Name -ne '.env.example')
+  ($_.FullName -notmatch '[\\/](node_modules|dist|\.git)[\\/]' -and
+    $_.FullName -ne $destination -and
+    -not $privateEnvironmentFile)
 } | Sort-Object FullName
 $lines = foreach ($file in $files) {
   $relative = $file.FullName.Substring($root.Length + 1).Replace('\', '/')
