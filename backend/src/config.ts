@@ -9,7 +9,8 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('8h'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   STRICT_INTEGRITY: z.enum(['true', 'false']).default('false').transform((value) => value === 'true'),
-  INTEGRITY_MANIFEST_PATH: z.preprocess((value) => value === '' ? undefined : value, z.string().min(1).optional())
+  INTEGRITY_MANIFEST_PATH: z.preprocess((value) => value === '' ? undefined : value, z.string().min(1).optional()),
+  APP_ENCRYPTION_KEY: z.preprocess((value) => value === '' ? undefined : value, z.string().min(32).optional())
 });
 
 export const env = envSchema.parse(process.env);

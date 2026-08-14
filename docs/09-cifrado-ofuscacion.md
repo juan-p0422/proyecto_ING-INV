@@ -39,6 +39,49 @@ El backend permanece bajo control del operador y constituye la frontera principa
 
 El cifrado solo es útil si las claves se administran de forma separada, se rotan y el proceso tiene acceso mínimo. Incluir una clave dentro del repositorio o imagen elimina gran parte del beneficio.
 
+### 9.3.1 Implementación educativa AES-256-GCM
+
+EduRoom implementa `encryptText` y `decryptText` en `backend/src/security/crypto.ts`. El algoritmo es **AES-256-GCM**:
+
+- AES utiliza una clave derivada de 256 bits;
+- GCM proporciona confidencialidad y una etiqueta de autenticación;
+- cada operación genera un IV aleatorio de 12 bytes;
+- la etiqueta permite detectar ciphertext, clave o metadatos incompatibles;
+- IV, etiqueta y ciphertext se representan en Base64 dentro de un payload JSON versionado.
+
+La clave de AES se deriva desde `APP_ENCRYPTION_KEY` mediante `scrypt`, con un contexto fijo de aplicación. La variable debe contener material aleatorio de al menos 32 caracteres y administrarse como secreto. `JWT_SECRET` no se reutiliza.
+
+AES-GCM se eligió porque combina cifrado autenticado e integridad del mensaje. A diferencia de un modo de cifrado sin autenticación, una modificación del ciphertext provoca que el descifrado falle en vez de producir silenciosamente texto alterado.
+
+### 9.3.2 Datos cifrados
+
+La demostración utiliza la tabla `SecureNote`:
+
+| Campo | Tratamiento |
+|---|---|
+| `id` | Identificador no cifrado necesario para persistencia |
+| `ownerId` | No cifrado; permite autorización e índice por propietario |
+| `encryptedPayload` | JSON con IV, etiqueta GCM y ciphertext; no contiene texto plano |
+| `createdAt` | No cifrado; permite orden cronológico |
+
+`POST /api/security/secure-notes` cifra el texto antes de llamar a Prisma. `GET /api/security/secure-notes` filtra primero por el propietario autenticado y solo entonces descifra. El payload cifrado nunca se devuelve al navegador.
+
+### 9.3.3 Datos que no se cifran
+
+No se cifra todo el código fuente, el bundle de React, identificadores necesarios para relaciones, fechas, rutas públicas ni archivos completos del repositorio. Tampoco se cifran contraseñas: estas se derivan con bcrypt y no deben recuperarse.
+
+El cifrado de aplicación tampoco reemplaza TLS. HTTPS protege datos mientras viajan; AES-GCM protege el campo seleccionado cuando está almacenado en la base. Los usuarios autorizados reciben el texto plano porque necesitan utilizarlo.
+
+### 9.3.4 Gestión y ausencia de clave
+
+Para generar una clave:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+El resultado se configura como `APP_ENCRYPTION_KEY` en `.env` local o en el gestor de secretos de Render. Nunca se confirma en Git ni se muestra en evidencias. Si la variable falta, los endpoints de notas responden `503` sin almacenar texto plano. Si cambia la clave, las notas anteriores no pueden autenticarse; una estrategia productiva requeriría identificadores de versión, rotación y respaldo seguro de claves.
+
 ## 9.4 Qué puede ofuscarse en el frontend
 
 En el frontend pueden minificarse archivos, acortarse identificadores internos, eliminarse comentarios, evitarse mapas de fuentes públicos y dividirse el bundle. Estas medidas reducen exposición casual y tamaño, pero no ocultan:
@@ -78,6 +121,10 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 5. Revisar encabezados HTTP, tamaño del bundle y ausencia de mapas de fuentes públicos.
 6. Generar el manifiesto SHA-256 y conservar la evidencia de compilación.
 7. Ejecutar `npm run integrity:verify` y comprobar el estado resumido del dashboard.
+8. Crear una nota segura con una cuenta de prueba y registrar su identificador.
+9. Consultar `SecureNote.encryptedPayload` directamente en la base controlada y confirmar que el texto no aparece en claro.
+10. Recuperar la nota mediante `GET /api/security/secure-notes` usando el token de su propietario.
+11. Repetir la consulta con otra cuenta y confirmar que la nota ajena no aparece.
 
 > **Espacio de evidencia EV-09-01:** variables configuradas mostrando solo nombres y origen, sin valores.
 
@@ -86,6 +133,12 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 > **Espacio de evidencia EV-09-03:** prueba sobre EduRoom donde una acción sin autorización sea rechazada por el backend.
 
 > **Espacio de evidencia EV-09-04:** comparación reproducible de tamaños normal/ofuscado y verificación posterior del manifest.
+
+> **Espacio de evidencia EV-09-05:** creación de nota segura mediante API autenticada, ocultando el token.
+
+> **Espacio de evidencia EV-09-06:** consulta directa a la base mostrando payload cifrado y ausencia del texto plano, sin revelar la clave.
+
+> **Espacio de evidencia EV-09-07:** recuperación autorizada de la nota y prueba de aislamiento con un segundo usuario.
 
 ## 9.7 Limitaciones reales
 
@@ -96,6 +149,9 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 - Un JWT firmado no está cifrado; su contenido puede leerse y no debe incluir secretos.
 - La protección del build no evita copias de la experiencia funcional ni sustituye licencias y medidas legales.
 - Las dependencias y herramientas de ofuscación pueden introducir vulnerabilidades y requieren mantenimiento.
+- Perder `APP_ENCRYPTION_KEY` implica perder la capacidad de recuperar las notas existentes.
+- El esquema educativo no implementa todavía rotación, versionado de claves ni un KMS/HSM.
+- Los metadatos `ownerId` y `createdAt` permanecen visibles para permitir consultas; cifrar un campo no oculta todos los patrones de uso.
 
 La meta razonable es reducir exposición accidental, preservar secretos del servidor y hacer cumplir permisos aunque se conozca el diseño. No existe una técnica que haga irreversible un cliente web distribuido.
 

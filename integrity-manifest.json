@@ -1,7 +1,7 @@
 {
   "version": 1,
   "algorithm": "sha256",
-  "generatedAt": "2026-08-14T02:03:04.069Z",
+  "generatedAt": "2026-08-14T02:09:28.464Z",
   "scopes": [
     {
       "root": "backend/dist",
@@ -26,13 +26,13 @@
     },
     {
       "path": "backend/dist/src/app.js",
-      "sha256": "9ab98eb97d47c93d21dac4401d25cffd5145aa24476de5f0d69f738fc64ebd1e",
-      "size": 2143
+      "sha256": "ea166258ff1a737c33bacf075b4cfa3fa40e8dc110b6f201fca28e3d3e49c9c5",
+      "size": 2089
     },
     {
       "path": "backend/dist/src/config.js",
-      "sha256": "8aed78c681bfc39fd4478dcfc6e10735e8aad2cbd7360a4e036d1428e9fc5d48",
-      "size": 839
+      "sha256": "f44039b90ef1d0e2033418368649b751cb27e4851c23d6d53a5c13abc8f970ab",
+      "size": 965
     },
     {
       "path": "backend/dist/src/lib/course-access.js",
@@ -85,6 +85,11 @@
       "size": 4905
     },
     {
+      "path": "backend/dist/src/routes/security.js",
+      "sha256": "0104a27717f6123956fad9bc8308c4a3f8ede0da07ef68d35a19febe140dc50e",
+      "size": 2328
+    },
+    {
       "path": "backend/dist/src/routes/submissions.js",
       "sha256": "57e8f69d1a6f9e0909ed610457cbfc98a32d761551d934a44ebc496c8075b61c",
       "size": 1627
@@ -98,6 +103,11 @@
       "path": "backend/dist/src/security/checksum.js",
       "sha256": "4180db40164312fa86879c076488cb7d24dce50b379129e087a82a6561f3e2ce",
       "size": 6278
+    },
+    {
+      "path": "backend/dist/src/security/crypto.js",
+      "sha256": "6eb72829ff2d45b795102bb73a5cfcd33cc3bd65d7336f4ef655b455a0e49084",
+      "size": 2797
     },
     {
       "path": "backend/dist/src/server.js",

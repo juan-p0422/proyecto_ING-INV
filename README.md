@@ -76,12 +76,34 @@ Salvo registro y login, los endpoints requieren `Authorization: Bearer <token>`.
 | Comentarios | `GET /api/courses/:courseId/comments` | Integrante |
 | Comentarios | `POST /api/courses/:courseId/comments` | Integrante |
 | Seguridad | `GET /api/security/integrity` | Resumen público sin hashes ni rutas |
+| Seguridad | `POST /api/security/secure-notes` | Crea una nota cifrada del usuario autenticado |
+| Seguridad | `GET /api/security/secure-notes` | Descifra únicamente las notas del usuario autenticado |
 
 `GET /comments` acepta `assignmentId` como query opcional. Las calificaciones se validan en el intervalo 0–100.
 
 ## Variables y seguridad
 
-Consulta [`.env.example`](.env.example). `JWT_SECRET` debe ser aleatorio y tener al menos 32 caracteres. `CORS_ORIGIN` acepta uno o varios orígenes separados por comas. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
+Consulta [`.env.example`](.env.example). `JWT_SECRET` y `APP_ENCRYPTION_KEY` deben ser valores aleatorios distintos de al menos 32 caracteres. `CORS_ORIGIN` acepta uno o varios orígenes separados por comas. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
+
+Genera una clave de cifrado de 32 bytes con Node.js:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Asigna el resultado a `APP_ENCRYPTION_KEY`. Si la variable no existe, la aplicación sigue disponible, pero los endpoints de notas seguras responden `503`. No cambies o pierdas la clave mientras existan notas: AES-GCM detectará la clave incorrecta y no podrá recuperarlas.
+
+Ejemplo autenticado:
+
+```bash
+curl -X POST http://localhost:3000/api/security/secure-notes \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Nota privada de demostración"}'
+
+curl http://localhost:3000/api/security/secure-notes \
+  -H "Authorization: Bearer <token>"
+```
 
 ## Integridad y build educativo
 

@@ -35,6 +35,7 @@ model User {
   submissions   Submission[]
   comments      Comment[]
   attachments   Attachment[]
+  secureNotes   SecureNote[]
 }
 
 model Course {
@@ -149,4 +150,14 @@ model Attachment {
   @@index([courseId])
   @@index([assignmentId])
   @@index([submissionId])
+}
+
+model SecureNote {
+  id               String   @id @default(cuid())
+  ownerId          String
+  encryptedPayload String
+  createdAt        DateTime @default(now())
+  owner            User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt])
 }
