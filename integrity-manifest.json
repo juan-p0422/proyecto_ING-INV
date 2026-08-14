@@ -1,7 +1,7 @@
 {
   "version": 1,
   "algorithm": "sha256",
-  "generatedAt": "2026-08-14T02:09:28.464Z",
+  "generatedAt": "2026-08-14T02:33:21.770Z",
   "scopes": [
     {
       "root": "backend/dist",
@@ -26,8 +26,8 @@
     },
     {
       "path": "backend/dist/src/app.js",
-      "sha256": "ea166258ff1a737c33bacf075b4cfa3fa40e8dc110b6f201fca28e3d3e49c9c5",
-      "size": 2089
+      "sha256": "f2db3cb3a21ef63d520cb07d4e9b8548ecb2b6e761ce42bd8b05736389873ddd",
+      "size": 3235
     },
     {
       "path": "backend/dist/src/config.js",
@@ -121,8 +121,8 @@
     },
     {
       "path": "frontend/dist/assets/index-xgXpUvdx.js",
-      "sha256": "5fbe7cd0c7ea8cdbde23cc67a6d53da4a6603d827442cf8062c5cfda1abf2085",
-      "size": 572346
+      "sha256": "cd2fae13d22d14902d8360818cdd1f46e4edfb0197b8a024079f554f2b493e7e",
+      "size": 265225
     },
     {
       "path": "frontend/dist/index.html",

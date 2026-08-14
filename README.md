@@ -23,11 +23,35 @@ Node.js 20+, Express, TypeScript, Prisma, PostgreSQL, JWT, bcrypt y Zod. El clie
 Requisitos: Docker Desktop y Docker Compose.
 
 ```bash
-docker compose up --build
+docker compose up --build -d
+docker compose ps
+curl http://localhost:3000/api/health
 docker compose exec backend npm run prisma:seed
 ```
 
-Abre `http://localhost:5173`. La API responde en `http://localhost:3000/api/health`.
+Abre `http://localhost:3000`. Express entrega la aplicación React y la API bajo `/api` desde el mismo contenedor. La primera ejecución espera a PostgreSQL, aplica `prisma migrate deploy` y después inicia el servidor. La respuesta de salud esperada es:
+
+```json
+{"status":"ok","service":"eduroom-api"}
+```
+
+Compose incluye valores de demostración para arrancar sin configuración adicional. Para personalizarlos, copia `.env.example` como `.env`, cambia las claves locales y vuelve a crear los contenedores. El archivo `.env` está ignorado por Git y no debe confirmarse.
+
+Para detener el entorno sin borrar los datos:
+
+```bash
+docker compose down
+```
+
+Usa `docker compose down -v` solo si también quieres eliminar el volumen local de PostgreSQL.
+
+La imagen full-stack también se puede construir por separado:
+
+```bash
+docker build -f backend/Dockerfile --build-arg VITE_API_URL=/api -t eduroom:local .
+```
+
+El Dockerfile usa etapas separadas para instalar y compilar Vite, generar Prisma, compilar TypeScript y crear una imagen de ejecución con dependencias de producción. Su comando final ejecuta `npm run start:prod`, que aplica las migraciones pendientes antes de `npm start`.
 
 El seed crea dos cuentas locales con la contraseña `Demo1234!`:
 
@@ -42,7 +66,8 @@ Estas credenciales son únicamente para desarrollo y no deben cargarse en un ent
 2. Configura PostgreSQL y ajusta `backend/.env` a partir de `backend/.env.example`.
 3. Ejecuta `npm --prefix backend run prisma:migrate`.
 4. Opcionalmente carga datos con `npm --prefix backend run prisma:seed`.
-5. Inicia API y cliente en terminales separadas con `npm run dev:backend` y `npm run dev:frontend`.
+5. Copia `frontend/.env.example` como `frontend/.env` para que Vite use `http://localhost:3000/api`.
+6. Inicia API y cliente en terminales separadas con `npm run dev:backend` y `npm run dev:frontend`.
 
 Para validar un build completo:
 
@@ -50,7 +75,7 @@ Para validar un build completo:
 npm run build
 ```
 
-Los scripts principales del backend son `dev`, `build`, `start`, `prisma:migrate` y `prisma:seed`. También se conservan alias `db:*` para los flujos de Docker existentes.
+Los scripts principales del backend son `dev`, `build`, `start`, `start:prod`, `prisma:migrate` y `prisma:seed`. También se conservan alias `db:*` para los flujos de Docker y Render.
 
 ## API
 
@@ -83,7 +108,20 @@ Salvo registro y login, los endpoints requieren `Authorization: Bearer <token>`.
 
 ## Variables y seguridad
 
-Consulta [`.env.example`](.env.example). `JWT_SECRET` y `APP_ENCRYPTION_KEY` deben ser valores aleatorios distintos de al menos 32 caracteres. `CORS_ORIGIN` acepta uno o varios orígenes separados por comas. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
+Consulta [`.env.example`](.env.example). Las variables principales son:
+
+| Variable | Uso |
+|---|---|
+| `DATABASE_URL` | Conexión PostgreSQL usada por Prisma. Compose la construye para el servicio `db`; Render la toma de la base administrada. |
+| `JWT_SECRET` | Firma de tokens; usa un secreto aleatorio de al menos 32 caracteres. |
+| `APP_ENCRYPTION_KEY` | Material de clave para AES-256-GCM; debe ser distinto de `JWT_SECRET`. |
+| `PORT` | Puerto de escucha. Compose usa `3000`; Render lo inyecta automáticamente. |
+| `NODE_ENV` | Usa `production` para servir `frontend/dist` desde Express. |
+| `CORS_ORIGIN` | Uno o varios orígenes exactos separados por comas. El valor `self` usa `RENDER_EXTERNAL_URL`. |
+| `STRICT_INTEGRITY` | Con `true`, una discrepancia del manifiesto bloquea el arranque. |
+| `VITE_API_URL` | URL incorporada al build de Vite; usa `/api` en la aplicación full-stack. |
+
+`JWT_EXPIRES_IN` e `INTEGRITY_MANIFEST_PATH` son opcionales. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
 
 Genera una clave de cifrado de 32 bytes con Node.js:
 
@@ -125,6 +163,12 @@ scripts/   preparación y manifiesto SHA-256
 ```
 
 La derivación conceptual del modelo se documenta en [`docs/05-reconstruccion-estructuras.md`](docs/05-reconstruccion-estructuras.md). El despliegue declarativo está en [`render.yaml`](render.yaml) y su procedimiento en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+
+## Despliegue en Render
+
+`render.yaml` crea PostgreSQL y un único servicio web Node. El build instala ambos paquetes, ejecuta `prisma generate` y compila backend y frontend; el arranque ejecuta `prisma migrate deploy` antes de iniciar Express. En Render selecciona **New > Blueprint**, conecta el repositorio y aplica el archivo de la raíz. Los secretos se generan sin quedar escritos en el repositorio.
+
+Después del despliegue valida `https://<servicio>.onrender.com/api/health` y abre la misma URL sin `/api/health` para probar la SPA. El procedimiento completo, la lista de variables y la solución de problemas están en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
 
 ## Aviso académico
 

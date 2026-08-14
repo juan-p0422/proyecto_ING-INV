@@ -3,14 +3,15 @@ databases:
     databaseName: eduroom
     user: eduroom
     plan: free
+    ipAllowList: []
 
 services:
   - type: web
-    name: eduroom-api
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: .
+    name: eduroom
+    runtime: node
     plan: free
+    buildCommand: npm ci --prefix backend && npm ci --prefix frontend && npm --prefix backend run db:generate && npm run build
+    startCommand: npm --prefix backend run start:prod
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
@@ -24,22 +25,10 @@ services:
       - key: JWT_EXPIRES_IN
         value: 8h
       - key: CORS_ORIGIN
-        value: https://eduroom-web.onrender.com
+        value: self
+      - key: VITE_API_URL
+        value: /api
       - key: NODE_ENV
         value: production
       - key: STRICT_INTEGRITY
         value: "false"
-
-  - type: web
-    name: eduroom-web
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm ci && npm run build:obfuscated
-    staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://eduroom-api.onrender.com/api
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
