@@ -1,208 +1,530 @@
-# EduRoom
+# EduRoom - Réplica académica independiente para proyecto de ingeniería inversa
 
-EduRoom es una implementación académica y original de funciones generales de un LMS. Su diseño procede de ingeniería inversa ética de caja negra: observación de interfaces y flujos, documentación pública y tráfico generado por una cuenta propia de prueba. No contiene código, recursos visuales, credenciales ni datos propietarios de Google.
+EduRoom es una aplicación LMS full-stack desarrollada como resultado de un examen práctico de ingeniería inversa ética. Implementa flujos de profesor y estudiante, cursos, anuncios, tareas, entregas, comentarios, calificaciones y controles educativos de seguridad.
+
+| Recurso | Enlace |
+|---|---|
+| Aplicación en Render | [https://eduroom-znb0.onrender.com](https://eduroom-znb0.onrender.com) |
+| Repositorio GitHub | [https://github.com/juan-p0422/proyecto_ING-INV](https://github.com/juan-p0422/proyecto_ING-INV) |
+| Índice documental | [`docs/00-indice.md`](docs/00-indice.md) |
+| Reporte final | [`docs/17-reporte-final-integrado.md`](docs/17-reporte-final-integrado.md) |
+| Auditoría de cumplimiento | [`docs/21-matriz-cumplimiento-rubrica.md`](docs/21-matriz-cumplimiento-rubrica.md) |
+
+## Aviso ético
+
+Google Classroom se utilizó únicamente como referencia externa no open source mediante un enfoque ético de **caja negra**. El análisis se limitó a información pública, interfaces visibles, flujos normales y acciones realizadas con cuentas controladas.
+
+No se vulneró Google Classroom, no se evadió autenticación, no se explotaron vulnerabilidades, no se descompiló software y no se accedió a código, datos o infraestructura propietarios. EduRoom fue escrito de forma independiente y no incorpora logos, activos, textos comerciales, credenciales ni identidad visual de Google.
+
+Las referencias a Google Classroom sirven exclusivamente para identificar el objeto académico observado. La réplica compara patrones funcionales generales de una plataforma LMS, no una implementación interna ni una equivalencia pixel a pixel.
+
+## Descripción
+
+El proyecto sigue esta secuencia:
+
+1. Recolección de información pública y observación funcional.
+2. Análisis dinámico no invasivo desde el navegador.
+3. Reconstrucción conceptual de entidades, estados y relaciones.
+4. Diseño e implementación independiente de EduRoom.
+5. Aplicación de cifrado, checksum, ofuscación y diagnóstico antireversing educativo.
+6. Validación mediante pruebas unitarias, API, seguridad defensiva y capturas visuales.
+7. Preparación de documentación y demostración presencial.
 
 ## Funcionalidades
 
-- Registro, login, consulta de sesión y JWT con contraseñas protegidas mediante bcrypt.
-- Roles globales `TEACHER` y `STUDENT`, además de rol local por inscripción.
-- Cursos con docente propietario, código de acceso y listado de integrantes.
-- Anuncios, tareas con fecha límite, entregas, calificación y retroalimentación.
-- Comentarios generales del curso o asociados a una tarea.
-- Modelo de adjuntos relacionado con cursos, tareas y entregas.
-- Validación de entradas con Zod, CORS configurable, Helmet y límite de solicitudes de autenticación.
+- Registro, login y consulta de la sesión autenticada.
+- Contraseñas protegidas con bcrypt y sesiones JWT.
+- Roles globales `TEACHER` y `STUDENT`.
+- Membresía y rol específico dentro de cada curso.
+- Creación, listado, consulta e ingreso a cursos mediante código.
+- Listado de integrantes.
+- Anuncios del profesor.
+- Tareas con descripción y fecha de entrega.
+- Entregas del estudiante.
+- Calificación de 0 a 100 y retroalimentación.
+- Comentarios generales o relacionados con una tarea.
+- Modelo de adjuntos asociado al dominio.
+- Estado público de integridad.
+- Notas seguras cifradas mediante AES-256-GCM.
+- Build opcional con ofuscación del JavaScript del frontend.
+- Checksum SHA-256 de artefactos compilados.
+- Diagnóstico antidebug educativo y no destructivo.
 
-El backend no devuelve `passwordHash`. Un docente solo puede crear contenido y calificar dentro de los cursos que posee; un estudiante solo puede entregar en cursos donde está inscrito como estudiante.
+## Arquitectura
 
-## Stack
+```mermaid
+flowchart LR
+    U["Navegador"]
+    F["Frontend React + Vite"]
+    A["API REST Express"]
+    P["Prisma ORM"]
+    D[("PostgreSQL")]
+    R["Render / Docker"]
 
-Node.js 20+, Express, TypeScript, Prisma, PostgreSQL, JWT, bcrypt y Zod. El cliente incluido usa React/Vite.
+    U --> F
+    F -->|"HTTPS / JSON / API"| A
+    A --> P
+    P --> D
+    R -. "alojamiento" .-> A
+    R -. "base administrada" .-> D
+```
 
-## Inicio rápido con Docker
+| Capa | Tecnologías | Responsabilidad |
+|---|---|---|
+| Frontend | React 19, TypeScript, Vite, React Router | Navegación, formularios, paneles y consumo de la API |
+| Backend | Node.js 20+, Express, TypeScript, Zod | API REST, autenticación, autorización, validación y reglas de negocio |
+| Persistencia | PostgreSQL, Prisma | Esquema, migraciones, relaciones y consultas parametrizadas |
+| Seguridad | JWT, bcrypt, AES-256-GCM, SHA-256, Helmet | Sesiones, contraseñas, cifrado de campo, integridad y cabeceras |
+| Build | npm, TypeScript, Vite, `javascript-obfuscator` | Compilación y build educativo opcional |
+| Contenedores | Docker, Docker Compose | PostgreSQL y aplicación full-stack reproducible |
+| Producción | Render Web Service y Render PostgreSQL | Deploy público, healthcheck y secretos administrados |
 
-Requisitos: Docker Desktop y Docker Compose.
+En producción, Express sirve la SPA compilada y la API bajo el mismo origen. En desarrollo, Vite y Express pueden ejecutarse por separado.
+
+## Estructura del repositorio
+
+```text
+.
+├── backend/
+│   ├── prisma/                 Esquema, migraciones y seed
+│   ├── src/                    API, middleware, rutas y seguridad
+│   ├── tests/                  Pruebas del backend
+│   └── Dockerfile              Imagen full-stack multietapa
+├── frontend/
+│   ├── src/                    Aplicación React
+│   ├── scripts/                Ofuscación del build
+│   └── tests/                  Pruebas del cliente/API
+├── docs/                       Memoria técnica y presentación
+├── evidence/                   Capturas y evidencia sanitizada
+├── scripts/                    Checksum, integridad y utilidades
+├── tests/                      Smoke, seguridad, Postman y Playwright
+├── docker-compose.yml          Entorno local con PostgreSQL
+├── render.yaml                 Blueprint de Render
+├── integrity-manifest.json     Manifest SHA-256 de artefactos
+├── .env.example                Plantilla para Docker Compose
+└── package.json                Scripts de orquestación
+```
+
+## Requisitos
+
+- Node.js 20 o superior.
+- npm.
+- PostgreSQL 16 o compatible para ejecución manual.
+- Docker Desktop y Docker Compose para el camino recomendado con contenedores.
+- Chrome o Chromium para las capturas Playwright.
+
+## Instalación local
+
+### Opción A: Docker Compose
+
+Es el camino más corto porque crea PostgreSQL y la aplicación:
 
 ```bash
+git clone https://github.com/juan-p0422/proyecto_ING-INV.git
+cd proyecto_ING-INV
 docker compose up --build -d
 docker compose ps
-curl http://localhost:3000/api/health
 docker compose exec backend npm run prisma:seed
 ```
 
-Abre `http://localhost:3000`. Express entrega la aplicación React y la API bajo `/api` desde el mismo contenedor. La primera ejecución espera a PostgreSQL, aplica `prisma migrate deploy` y después inicia el servidor. La respuesta de salud esperada es:
+Abrir [http://localhost:3000](http://localhost:3000). Comprobar la API:
 
-```json
-{"status":"ok","service":"eduroom-api","uptime":12.345,"timestamp":"2026-08-13T20:00:00.000Z","environment":"production"}
+```bash
+curl http://localhost:3000/api/health
 ```
 
-Compose incluye valores de demostración para arrancar sin configuración adicional. Para personalizarlos, copia `.env.example` como `.env`, cambia las claves locales y vuelve a crear los contenedores. El archivo `.env` está ignorado por Git y no debe confirmarse.
-
-Para detener el entorno sin borrar los datos:
+Para detener sin borrar el volumen:
 
 ```bash
 docker compose down
 ```
 
-Usa `docker compose down -v` solo si también quieres eliminar el volumen local de PostgreSQL.
+`docker compose down -v` elimina también el volumen local de PostgreSQL. No usarlo si se desea conservar la base.
 
-La imagen full-stack también se puede construir por separado:
+### Opción B: npm y PostgreSQL local
+
+Clonar e instalar las tres capas de dependencias:
 
 ```bash
-docker build -f backend/Dockerfile --build-arg VITE_API_URL=/api -t eduroom:local .
+git clone https://github.com/juan-p0422/proyecto_ING-INV.git
+cd proyecto_ING-INV
+npm install
+npm run install:all
 ```
 
-El Dockerfile usa etapas separadas para instalar y compilar Vite, generar Prisma, compilar TypeScript y crear una imagen de ejecución con dependencias de producción. Su comando final ejecuta `npm run start:prod`, que aplica las migraciones pendientes antes de `npm start`.
+El primer comando instala las herramientas de la raíz; `install:all` instala backend y frontend. También pueden ejecutarse por separado:
 
-## Credenciales demo
+```bash
+npm --prefix backend install
+npm --prefix frontend install
+```
 
-Después de ejecutar `docker compose exec backend npm run prisma:seed`, quedan disponibles:
+Copiar las plantillas:
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+En PowerShell:
+
+```powershell
+Copy-Item backend/.env.example backend/.env
+Copy-Item frontend/.env.example frontend/.env
+```
+
+Configurar `backend/.env` con una base PostgreSQL local y secretos nuevos. Después:
+
+```bash
+npm --prefix backend run db:generate
+npm --prefix backend run prisma:migrate
+npm --prefix backend run prisma:seed
+```
+
+## Variables de entorno
+
+No se incluyen secretos reales. Las plantillas versionadas son:
+
+- [`.env.example`](.env.example), para Docker Compose;
+- [`backend/.env.example`](backend/.env.example), para la API;
+- [`frontend/.env.example`](frontend/.env.example), para Vite.
+
+| Variable | Componente | Propósito |
+|---|---|---|
+| `POSTGRES_DB` | Compose | Nombre de la base local |
+| `POSTGRES_USER` | Compose | Usuario local de PostgreSQL |
+| `POSTGRES_PASSWORD` | Compose | Contraseña local; reemplazar el placeholder |
+| `DATABASE_URL` | Backend | Cadena de conexión de Prisma |
+| `JWT_SECRET` | Backend | Firma JWT; usar un secreto aleatorio de al menos 32 caracteres |
+| `JWT_EXPIRES_IN` | Backend | Duración de la sesión; valor predeterminado `8h` |
+| `APP_ENCRYPTION_KEY` | Backend | Material secreto para derivar la clave AES-256-GCM |
+| `PORT` | Backend | Puerto HTTP; predeterminado `3000` |
+| `NODE_ENV` | Backend | `development`, `test` o `production` |
+| `CORS_ORIGIN` | Backend | Orígenes permitidos; `self` en Render |
+| `STRICT_INTEGRITY` | Backend | Si es `true`, bloquea el arranque ante integridad no verificada |
+| `INTEGRITY_MANIFEST_PATH` | Backend | Ruta opcional al manifest |
+| `VITE_API_URL` | Frontend | Base de la API incorporada al build |
+
+Generar material de cifrado para desarrollo:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+No reutilizar `JWT_SECRET` como `APP_ENCRYPTION_KEY`. No confirmar archivos `.env` ni mostrar sus valores en capturas.
+
+Verificación de archivos de ambiente rastreados:
+
+```bash
+git ls-files | grep -E '(^|/)\.env($|\.)'
+```
+
+PowerShell:
+
+```powershell
+git ls-files | Select-String '(^|/)\.env($|\.)'
+```
+
+La salida esperada contiene únicamente los tres archivos `.env.example`.
+
+## Ejecución local
+
+Con PostgreSQL y migraciones preparados, iniciar en dos terminales:
+
+```bash
+# Terminal 1: API en http://localhost:3000
+npm run dev:backend
+
+# Terminal 2: Vite en http://localhost:5173
+npm run dev:frontend
+```
+
+`frontend/.env` debe apuntar a `http://localhost:3000/api`.
+
+Para ejecutar la compilación full-stack directamente:
+
+```bash
+npm run build
+npm --prefix backend start
+```
+
+Con `NODE_ENV=production`, el backend sirve `frontend/dist`.
+
+## Build e integridad
+
+Build normal:
+
+```bash
+npm run build
+```
+
+Build con ofuscación del JavaScript:
+
+```bash
+npm run build:obfuscated
+```
+
+Release educativa coherente:
+
+```bash
+npm run release:educational
+```
+
+La release educativa:
+
+1. compila backend;
+2. compila y ofusca el JavaScript del frontend;
+3. genera `integrity-manifest.json`;
+4. verifica SHA-256.
+
+También pueden ejecutarse las etapas:
+
+```bash
+node scripts/generate-checksum.js
+node scripts/verify-integrity.js
+```
+
+El manifest debe generarse después de la última transformación. `npm run build` produce bytes distintos del build ofuscado y puede hacer que un manifest anterior falle correctamente.
+
+El verificador CLI cubre 22 artefactos del manifest actual. El verificador de arranque y `/api/security/integrity` resumen 19 archivos JavaScript del backend. En `render.yaml`, `STRICT_INTEGRITY` permanece en `false`.
+
+## Prisma: migraciones y seed
+
+Generar el cliente:
+
+```bash
+npm --prefix backend run db:generate
+```
+
+Crear o aplicar una migración en desarrollo:
+
+```bash
+npm --prefix backend run prisma:migrate
+```
+
+Aplicar migraciones existentes sin crear nuevas:
+
+```bash
+npm --prefix backend run db:deploy
+```
+
+Cargar datos demo:
+
+```bash
+npm --prefix backend run prisma:seed
+```
+
+En Docker:
+
+```bash
+docker compose exec backend npm run prisma:seed
+```
+
+El seed usa `upsert`, por lo que puede repetirse para restaurar el escenario conocido.
+
+## Credenciales demo locales
+
+Estas credenciales están implementadas en [`backend/prisma/seed.ts`](backend/prisma/seed.ts) y solo existen después de ejecutar el seed:
 
 | Rol | Correo | Contraseña |
 |---|---|---|
 | Profesor | `teacher@eduroom.local` | `Teacher123!` |
 | Estudiante | `student@eduroom.local` | `Student123!` |
 
-El seed también crea el curso `Diseño de experiencias educativas`, código `AULA2026`, un anuncio, una tarea, una inscripción, una entrega pendiente y un comentario. Es idempotente: puede repetirse para restaurar el escenario antes de una presentación.
+El seed también crea el curso `Diseño de experiencias educativas`, código `AULA2026`, un anuncio, una tarea, una entrega y un comentario.
 
-Estas credenciales son exclusivamente locales y no deben cargarse en un entorno público.
-
-## Desarrollo sin Docker
-
-1. Ejecuta `powershell -ExecutionPolicy Bypass -File scripts/setup.ps1`.
-2. Configura PostgreSQL y ajusta `backend/.env` a partir de `backend/.env.example`.
-3. Ejecuta `npm --prefix backend run prisma:migrate`.
-4. Opcionalmente carga datos con `npm --prefix backend run prisma:seed`.
-5. Copia `frontend/.env.example` como `frontend/.env` para que Vite use `http://localhost:3000/api`.
-6. Inicia API y cliente en terminales separadas con `npm run dev:backend` y `npm run dev:frontend`.
-
-Para validar un build completo:
-
-```bash
-npm run build
-npm test
-```
-
-Ambos comandos deben finalizar con código `0`. El build valida TypeScript y genera los artefactos de producción; las pruebas cubren cifrado autenticado, manipulación de ciphertext, healthcheck y entrega de la SPA sin confundir rutas `/api` con rutas del frontend.
-
-Los scripts principales del backend son `dev`, `build`, `start`, `start:prod`, `prisma:migrate` y `prisma:seed`. También se conservan alias `db:*` para los flujos de Docker y Render.
-
-## API
-
-Salvo registro y login, los endpoints requieren `Authorization: Bearer <token>`.
-
-| Área | Método y ruta | Acceso |
-|---|---|---|
-| Auth | `POST /api/auth/register` | Público; `role` opcional (`STUDENT` por defecto) |
-| Auth | `POST /api/auth/login` | Público |
-| Auth | `GET /api/auth/me` | Autenticado |
-| Cursos | `GET /api/courses` | Cursos del usuario |
-| Cursos | `POST /api/courses` | Docente |
-| Cursos | `GET /api/courses/:id` | Integrante |
-| Cursos | `POST /api/courses/join` | Autenticado, mediante `code` |
-| Cursos | `GET /api/courses/:id/members` | Integrante |
-| Anuncios | `GET /api/courses/:courseId/announcements` | Integrante |
-| Anuncios | `POST /api/courses/:courseId/announcements` | Docente propietario |
-| Tareas | `GET /api/courses/:courseId/assignments` | Integrante |
-| Tareas | `POST /api/courses/:courseId/assignments` | Docente propietario |
-| Tareas | `GET /api/assignments/:id` | Integrante; entregas filtradas por rol |
-| Entregas | `POST /api/assignments/:id/submit` | Estudiante inscrito |
-| Entregas | `PATCH /api/submissions/:id/grade` | Docente propietario |
-| Comentarios | `GET /api/courses/:courseId/comments` | Integrante |
-| Comentarios | `POST /api/courses/:courseId/comments` | Integrante |
-| Seguridad | `GET /api/security/integrity` | Resumen público sin hashes ni rutas |
-| Seguridad | `POST /api/security/secure-notes` | Crea una nota cifrada del usuario autenticado |
-| Seguridad | `GET /api/security/secure-notes` | Descifra únicamente las notas del usuario autenticado |
-
-`GET /comments` acepta `assignmentId` como query opcional. Las calificaciones se validan en el intervalo 0–100.
-
-## Variables y seguridad
-
-Consulta [`.env.example`](.env.example). Las variables principales son:
-
-| Variable | Uso |
-|---|---|
-| `DATABASE_URL` | Conexión PostgreSQL usada por Prisma. Compose la construye para el servicio `db`; Render la toma de la base administrada. |
-| `JWT_SECRET` | Firma de tokens; usa un secreto aleatorio de al menos 32 caracteres. |
-| `APP_ENCRYPTION_KEY` | Material de clave para AES-256-GCM; debe ser distinto de `JWT_SECRET`. |
-| `PORT` | Puerto de escucha. Compose usa `3000`; Render lo inyecta automáticamente. |
-| `NODE_ENV` | Usa `production` para servir `frontend/dist` desde Express. |
-| `CORS_ORIGIN` | Uno o varios orígenes exactos separados por comas. El valor `self` usa `RENDER_EXTERNAL_URL`. |
-| `STRICT_INTEGRITY` | Con `true`, una discrepancia del manifiesto bloquea el arranque. |
-| `VITE_API_URL` | URL incorporada al build de Vite; usa `/api` en la aplicación full-stack. |
-
-`JWT_EXPIRES_IN` e `INTEGRITY_MANIFEST_PATH` son opcionales. Nunca confirmes archivos `.env`; en producción usa HTTPS y el gestor de secretos de la plataforma.
-
-Antes de entregar, verifica que solo estén versionadas las plantillas públicas:
-
-```bash
-git ls-files | grep -E '(^|/)\.env($|\.)'
-```
-
-En PowerShell, el equivalente es `git ls-files | Select-String '(^|/)\.env($|\.)'`.
-
-La salida esperada contiene únicamente `.env.example`, `backend/.env.example` y `frontend/.env.example`; nunca una ruta terminada exactamente en `.env` ni variantes privadas como `.env.local`.
-
-Genera una clave de cifrado de 32 bytes con Node.js:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-Asigna el resultado a `APP_ENCRYPTION_KEY`. Si la variable no existe, la aplicación sigue disponible, pero los endpoints de notas seguras responden `503`. No cambies o pierdas la clave mientras existan notas: AES-GCM detectará la clave incorrecta y no podrá recuperarlas.
-
-Ejemplo autenticado:
-
-```bash
-curl -X POST http://localhost:3000/api/security/secure-notes \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Nota privada de demostración"}'
-
-curl http://localhost:3000/api/security/secure-notes \
-  -H "Authorization: Bearer <token>"
-```
-
-## Integridad y build educativo
-
-```bash
-npm run release:educational
-```
-
-El comando compila, ofusca el JavaScript propio del frontend, genera `integrity-manifest.json` y verifica SHA-256. También están disponibles `npm run integrity:generate` y `npm run integrity:verify`. La ofuscación no es cifrado y no sustituye autorización ni gestión de secretos.
-
-El backend verifica sus artefactos antes de abrir el puerto. `STRICT_INTEGRITY=true` bloquea el inicio ante una discrepancia, un manifiesto inválido o ausente; con `false` registra una advertencia o estado no disponible. `INTEGRITY_MANIFEST_PATH` permite indicar una ubicación alternativa.
-
-## Estructura
-
-```text
-backend/   API, esquema Prisma, migraciones y seed
-frontend/  cliente React/Vite
-docs/      memoria académica y protocolo ético
-scripts/   preparación y manifiesto SHA-256
-```
-
-La derivación conceptual del modelo se documenta en [`docs/05-reconstruccion-estructuras.md`](docs/05-reconstruccion-estructuras.md). El despliegue declarativo está en [`render.yaml`](render.yaml) y su procedimiento en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
-
-Para la exposición consulta [`docs/12-guion-presentacion.md`](docs/12-guion-presentacion.md) y completa [`docs/13-evidencias.md`](docs/13-evidencias.md).
-
-El índice completo de la memoria y la correspondencia con los requisitos del examen están en [`docs/00-indice.md`](docs/00-indice.md).
+No cargar estas credenciales conocidas en Render ni en otro ambiente público. En el deploy público se debe registrar una cuenta temporal con datos sintéticos o usar cuentas controladas creadas específicamente para la demostración.
 
 ## Despliegue en Render
 
-`render.yaml` crea PostgreSQL y un único servicio web Node. El build instala ambos paquetes, ejecuta `prisma generate` y compila backend y frontend; el arranque ejecuta `prisma migrate deploy` antes de iniciar Express. En Render selecciona **New > Blueprint**, conecta el repositorio y aplica el archivo de la raíz. Los secretos se generan sin quedar escritos en el repositorio.
+[`render.yaml`](render.yaml) declara:
 
-Después del despliegue valida `https://<servicio>.onrender.com/api/health` y abre la misma URL sin `/api/health` para probar la SPA. El procedimiento completo, la lista de variables y la solución de problemas están en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+- PostgreSQL administrado;
+- un servicio web Node;
+- build de backend y frontend;
+- migraciones antes del arranque;
+- healthcheck en `/api/health`;
+- generación de `JWT_SECRET` y `APP_ENCRYPTION_KEY`;
+- CORS de mismo origen.
 
-## Limitaciones éticas y técnicas
+Procedimiento:
 
-- El análisis descrito es de caja negra, manual y limitado a información pública, interfaces visibles y acciones realizadas con cuentas y datos de prueba autorizados. No incluye evasión de autenticación, explotación, scraping masivo, descompilación, extracción de código ni acceso a datos de terceros.
-- Las entidades reconstruidas son inferencias conceptuales para EduRoom; no revelan ni pretenden describir la arquitectura, base de datos o código internos de Google Classroom.
-- EduRoom no usa logos, iconos, tipografías remotas, capturas incorporadas, paletas de marca ni otros assets de Google. Las referencias textuales se conservan solo para identificar el objeto académico del análisis y citar documentación pública.
-- El JWT se guarda en `localStorage` por simplicidad del prototipo; una aplicación productiva debería evaluar cookies `HttpOnly`, protección CSRF, revocación y renovación de sesión.
-- Los adjuntos están reconstruidos en el modelo de datos, pero no existe carga binaria ni almacenamiento de archivos. Tampoco se implementan recuperación de cuenta, notificaciones, auditoría completa, rúbricas, rotación de claves o KMS.
-- SHA-256 detecta cambios respecto de un manifiesto confiable, pero no autentica por sí solo al autor. La ofuscación solo eleva el esfuerzo de lectura y AES-GCM protege las notas seguras seleccionadas, no todo el sistema ni el código entregado al navegador.
-- El seed contiene credenciales conocidas y datos sintéticos: es exclusivo para desarrollo y demostraciones locales, no para un despliegue público.
+1. Confirmar el commit que se desea desplegar.
+2. En Render, seleccionar **New > Blueprint**.
+3. Conectar el repositorio.
+4. Aplicar `render.yaml`.
+5. Confirmar que los secretos se administran desde Render y no desde el repositorio.
+6. Esperar el deploy y comprobar:
 
-## Aviso académico
+```bash
+curl https://eduroom-znb0.onrender.com/api/health
+curl https://eduroom-znb0.onrender.com/api/security/integrity
+```
 
-Las entidades de EduRoom son una reconstrucción conceptual propia, no una afirmación sobre la implementación interna de Google Classroom. Las observaciones deben acompañarse de fecha, entorno, evidencia anonimizada y nivel de certeza. Está prohibido incorporar credenciales, tokens, datos de terceros o capturas con información personal.
+El build declarado actualmente ejecuta `npm run build`, no el build ofuscado. Para acreditar ofuscación en producción se debe actualizar la canalización, redesplegar y conservar evidencia. El procedimiento completo está en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+
+## Endpoints principales
+
+Salvo los endpoints marcados como públicos, se requiere:
+
+```http
+Authorization: Bearer <token>
+```
+
+| Área | Método | Ruta | Acceso |
+|---|---|---|---|
+| Salud | GET | `/api/health` | Público |
+| Autenticación | POST | `/api/auth/register` | Público |
+| Autenticación | POST | `/api/auth/login` | Público |
+| Autenticación | GET | `/api/auth/me` | Autenticado |
+| Cursos | GET | `/api/courses` | Autenticado |
+| Cursos | POST | `/api/courses` | Profesor |
+| Cursos | GET | `/api/courses/:id` | Integrante |
+| Cursos | POST | `/api/courses/join` | Autenticado |
+| Cursos | GET | `/api/courses/:id/members` | Integrante |
+| Anuncios | GET | `/api/courses/:courseId/announcements` | Integrante |
+| Anuncios | POST | `/api/courses/:courseId/announcements` | Profesor propietario |
+| Tareas | GET | `/api/courses/:courseId/assignments` | Integrante |
+| Tareas | POST | `/api/courses/:courseId/assignments` | Profesor propietario |
+| Tareas | GET | `/api/assignments/:id` | Integrante |
+| Entregas | POST | `/api/assignments/:id/submit` | Estudiante inscrito |
+| Entregas | PATCH | `/api/submissions/:id/grade` | Profesor propietario |
+| Comentarios | GET | `/api/courses/:courseId/comments` | Integrante |
+| Comentarios | POST | `/api/courses/:courseId/comments` | Integrante |
+| Seguridad | GET | `/api/security/integrity` | Público; resumen sin rutas ni hashes |
+| Seguridad | POST | `/api/security/secure-notes` | Autenticado |
+| Seguridad | GET | `/api/security/secure-notes` | Propietario autenticado |
+
+`GET /api/courses/:courseId/comments` acepta `assignmentId` como query opcional. Las calificaciones se validan entre 0 y 100.
+
+## Pruebas
+
+### Unitarias
+
+```bash
+npm test
+```
+
+La última auditoría documentada obtuvo 9 pruebas de backend y 2 de frontend aprobadas.
+
+### API en Render
+
+```bash
+node tests/render-api-smoke-test.js
+```
+
+El smoke test ejecuta 26 solicitudes secuenciales con cuentas `example.com` únicas. No imprime tokens, contraseñas ni códigos. Crea datos sintéticos persistentes; usarlo de forma puntual, nunca en bucle.
+
+Para un entorno local:
+
+```powershell
+$env:EDUROOM_BASE_URL = 'http://localhost:3000'
+node tests/render-api-smoke-test.js
+```
+
+También puede importarse [`tests/eduroom-render.postman_collection.json`](tests/eduroom-render.postman_collection.json). Resultados: [`docs/14-pruebas-api-render.md`](docs/14-pruebas-api-render.md).
+
+### Seguridad defensiva
+
+```bash
+node tests/render-security-check.js
+```
+
+Comprueba acceso sin token, token inválido, payload vacío, exposición de `passwordHash`, CORS, integridad y restricciones de rol. No realiza fuerza bruta, carga, fuzzing agresivo ni pruebas contra Google Classroom. Resultados: [`docs/15-analisis-vulnerabilidades.md`](docs/15-analisis-vulnerabilidades.md).
+
+### UI de EduRoom
+
+```bash
+npm run capture:ui
+```
+
+Playwright captura exclusivamente EduRoom en escritorio, tableta y móvil. No automatiza Google Classroom. Las imágenes se guardan en [`evidence/ui/eduroom/`](evidence/ui/eduroom/) y el reporte está en [`docs/18-capturas-eduroom-render.md`](docs/18-capturas-eduroom-render.md).
+
+### Checksum
+
+```bash
+npm run integrity:verify
+```
+
+La prueba de fallo debe ejecutarse solo sobre una copia temporal. No regenerar el manifest inmediatamente después de una discrepancia sin investigar su causa.
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [00 - Índice](docs/00-indice.md) | Navegación y correspondencia con la consigna |
+| [01 - Marco teórico](docs/01-marco-teorico.md) | Fundamentos, términos y ética |
+| [02 - Análisis de Google Classroom](docs/02-analisis-google-classroom.md) | Información pública y observación funcional |
+| [03 - Herramientas](docs/03-herramientas-utilizadas.md) | Instrumentos y trazabilidad |
+| [04 - Análisis dinámico](docs/04-analisis-dinamico.md) | Network, Application, Performance y Memory |
+| [05 - Reconstrucción](docs/05-reconstruccion-estructuras.md) | Modelo conceptual de datos |
+| [06 - Diseño de la réplica](docs/06-diseno-replica.md) | Arquitectura y flujos |
+| [07 - Seguridad y antireversing](docs/07-seguridad-antireversing.md) | Integridad y diagnóstico educativo |
+| [08 - Checksum](docs/08-checksum.md) | SHA-256 y manifests |
+| [09 - Cifrado y ofuscación](docs/09-cifrado-ofuscacion.md) | AES-GCM y build ofuscado |
+| [10 - Render](docs/10-despliegue-render.md) | Docker y despliegue |
+| [11 - Conclusiones](docs/11-conclusiones.md) | Resultados y limitaciones |
+| [12 - Guion](docs/12-guion-presentacion.md) | Exposición presencial de 8–12 minutos |
+| [13 - Evidencias](docs/13-evidencias.md) | Checklist y privacidad |
+| [14 - Pruebas API](docs/14-pruebas-api-render.md) | Contratos y resultados en Render |
+| [15 - Vulnerabilidades](docs/15-analisis-vulnerabilidades.md) | OWASP y pruebas defensivas |
+| [16 - Comparativo UI](docs/16-comparativo-ui.md) | Correspondencia funcional y visual |
+| [17 - Reporte integrado](docs/17-reporte-final-integrado.md) | Memoria académica completa |
+| [18 - Capturas](docs/18-capturas-eduroom-render.md) | Evidencia Playwright y responsive |
+| [19 - Diapositivas](docs/19-presentacion-diapositivas.md) | Estructura de 15 diapositivas |
+| [20 - Validación de seguridad](docs/20-validacion-seguridad-producto.md) | Checksum, cifrado, ofuscación y antireversing |
+| [21 - Matriz de rúbrica](docs/21-matriz-cumplimiento-rubrica.md) | Auditoría final y acciones pendientes |
+| [Comparativo listo para PDF](docs/pdf/comparativo-ui-print.md) | Maquetación imprimible del comparativo |
+
+## Evidencias
+
+[`evidence/`](evidence/) organiza:
+
+```text
+evidence/
+├── api/
+├── ui/
+│   ├── google-classroom/
+│   └── eduroom/
+├── security/
+├── render/
+├── github/
+├── database/
+└── presentation/
+```
+
+La guía de nombres, privacidad, hashes y trazabilidad está en [`evidence/README.md`](evidence/README.md). Las capturas de Google Classroom deben ser propias, manuales, autorizadas y anonimizadas. Ningún script del repositorio abre o captura ese servicio.
+
+## Presentación presencial
+
+- [Guion listo para decir](docs/12-guion-presentacion.md).
+- [Estructura de 15 diapositivas](docs/19-presentacion-diapositivas.md).
+- [Checklist de evidencias](docs/13-evidencias.md).
+- [Reporte final](docs/17-reporte-final-integrado.md).
+
+El guion incluye dos perfiles de navegador, demo profesor-estudiante, endpoint de salud, integridad, repositorio y planes B para Render lento o ausencia de Internet.
+
+## Limitaciones
+
+- El análisis externo no revela ni pretende reproducir la implementación interna de Google Classroom.
+- Faltan capturas manuales finales de Classroom, Network, Application y Performance/Memory.
+- El registro público permite solicitar el rol `TEACHER`; una versión productiva debe usar invitación o aprobación.
+- El JWT se almacena en `localStorage`; se recomienda evaluar cookies `HttpOnly`, `SameSite`, CSRF y revocación.
+- El modelo incluye adjuntos, pero no existe carga binaria ni almacenamiento de archivos.
+- No se implementan recuperación de cuenta, notificaciones, rúbricas, auditoría completa ni limpieza de datos QA.
+- Las pruebas contra Render crean datos sintéticos persistentes.
+- `STRICT_INTEGRITY=false` prioriza disponibilidad; el endpoint runtime verifica el backend, no todo el frontend.
+- El pipeline actual de Render compila sin ofuscación.
+- SHA-256 no firma el manifest y la ofuscación no vuelve secreto el código del navegador.
+- AES-GCM protege únicamente `SecureNote.encryptedPayload`; no todo el sistema.
+- No existe rotación de `APP_ENCRYPTION_KEY` ni KMS/HSM.
+- El login presenta un overflow horizontal documentado en el viewport de 768 × 1024.
+- El healthcheck no publica commit o versión, por lo que debe correlacionarse manualmente con el despliegue.
+
+## Licencia y uso académico
+
+Este repositorio se preparó para evaluación, demostración y aprendizaje académico. No se encontró un archivo `LICENSE` en la versión auditada; por tanto, la publicación del código no concede automáticamente permisos de copia, modificación o redistribución más allá de los permitidos por la legislación aplicable.
+
+Si el proyecto se publica formalmente como open source, el mantenedor debe añadir una licencia explícita —por ejemplo MIT, Apache-2.0 o la que corresponda— después de revisar dependencias, obligaciones y política institucional.
+
+EduRoom no está afiliado con Google. Google Classroom y las marcas mencionadas pertenecen a sus respectivos titulares.

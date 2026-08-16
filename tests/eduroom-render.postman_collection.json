@@ -1,0 +1,185 @@
+{
+  "info": {
+    "_postman_id": "8ec7188c-48d4-4b4d-a7e5-eduroom-render-qa",
+    "name": "EduRoom Render - QA funcional",
+    "description": "Colección secuencial de baja carga para EduRoom. Usa exclusivamente datos sintéticos y conserva tokens como variables temporales de la colección. Ejecutar una sola iteración y no exportar valores actuales con tokens.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('runId')) {",
+          "  const runId = Date.now() + '-' + Math.random().toString(36).slice(2, 8);",
+          "  pm.collectionVariables.set('runId', runId);",
+          "  pm.collectionVariables.set('password', 'Qa-' + runId + '-A1!');",
+          "  pm.collectionVariables.set('teacherEmail', 'qa.teacher.' + runId + '@example.com');",
+          "  pm.collectionVariables.set('studentEmail', 'qa.student.' + runId + '@example.com');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "https://eduroom-znb0.onrender.com" },
+    { "key": "runId", "value": "" },
+    { "key": "password", "value": "" },
+    { "key": "teacherEmail", "value": "" },
+    { "key": "studentEmail", "value": "" },
+    { "key": "teacherToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "courseId", "value": "" },
+    { "key": "courseCode", "value": "" },
+    { "key": "assignmentId", "value": "" },
+    { "key": "submissionId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "01 Salud y seguridad pública",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/health" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('HTTP 200 y servicio saludable', () => { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.status).to.eql('ok'); pm.expect(b.service).to.eql('eduroom-api'); });"] } }]
+        },
+        {
+          "name": "GET Integridad",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/security/integrity" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Resumen de integridad válido', () => { pm.response.to.have.status(200); pm.expect(['verified','warning','unavailable']).to.include(pm.response.json().status); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "02 Autenticación",
+      "item": [
+        {
+          "name": "POST Registrar docente",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"QA Teacher {{runId}}\",\"email\":\"{{teacherEmail}}\",\"password\":\"{{password}}\",\"role\":\"TEACHER\"}" }, "url": "{{baseUrl}}/api/auth/register" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Docente registrado', () => pm.response.to.have.status(201));"] } }]
+        },
+        {
+          "name": "POST Registrar estudiante",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"QA Student {{runId}}\",\"email\":\"{{studentEmail}}\",\"password\":\"{{password}}\",\"role\":\"STUDENT\"}" }, "url": "{{baseUrl}}/api/auth/register" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Estudiante registrado', () => pm.response.to.have.status(201));"] } }]
+        },
+        {
+          "name": "POST Login docente",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"{{teacherEmail}}\",\"password\":\"{{password}}\"}" }, "url": "{{baseUrl}}/api/auth/login" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Login docente', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('teacherToken', pm.response.json().token);"] } }]
+        },
+        {
+          "name": "POST Login estudiante",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"{{studentEmail}}\",\"password\":\"{{password}}\"}" }, "url": "{{baseUrl}}/api/auth/login" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Login estudiante', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('studentToken', pm.response.json().token);"] } }]
+        },
+        {
+          "name": "GET Perfil docente",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}", "type": "text" }], "url": "{{baseUrl}}/api/auth/me" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Perfil autenticado', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().passwordHash).to.be.undefined; });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "03 Cursos",
+      "item": [
+        {
+          "name": "GET Cursos docente",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }], "url": "{{baseUrl}}/api/courses" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Lista de cursos', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array'); });"] } }]
+        },
+        {
+          "name": "POST Crear curso",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Curso QA {{runId}}\",\"description\":\"Datos sintéticos\",\"color\":\"#315f72\"}" }, "url": "{{baseUrl}}/api/courses" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Curso creado', () => pm.response.to.have.status(201));", "const b=pm.response.json(); pm.collectionVariables.set('courseId', b.id); pm.collectionVariables.set('courseCode', b.code);"] } }]
+        },
+        {
+          "name": "POST Unir estudiante",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"code\":\"{{courseCode}}\"}" }, "url": "{{baseUrl}}/api/courses/join" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Estudiante unido', () => pm.response.to.have.status(201));"] } }]
+        },
+        {
+          "name": "GET Detalle curso",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }], "url": "{{baseUrl}}/api/courses/{{courseId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Detalle accesible', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "GET Integrantes",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }], "url": "{{baseUrl}}/api/courses/{{courseId}}/members" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Dos integrantes', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.have.length(2); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "04 Anuncios y comentarios",
+      "item": [
+        {
+          "name": "POST Crear anuncio",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Aviso QA\",\"content\":\"Ejecución {{runId}}\"}" }, "url": "{{baseUrl}}/api/courses/{{courseId}}/announcements" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Anuncio creado', () => pm.response.to.have.status(201));"] } }]
+        },
+        {
+          "name": "GET Anuncios",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/api/courses/{{courseId}}/announcements" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Anuncios listados', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').and.not.empty; });"] } }]
+        },
+        {
+          "name": "POST Crear comentario",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"assignmentId\":null,\"content\":\"Comentario sintético {{runId}}\"}" }, "url": "{{baseUrl}}/api/courses/{{courseId}}/comments" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Comentario creado', () => pm.response.to.have.status(201));"] } }]
+        },
+        {
+          "name": "GET Comentarios",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }], "url": "{{baseUrl}}/api/courses/{{courseId}}/comments" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Comentarios listados', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').and.not.empty; });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "05 Tareas y entregas",
+      "item": [
+        {
+          "name": "POST Crear tarea",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Tarea QA\",\"description\":\"Actividad {{runId}}\",\"dueDate\":null}" }, "url": "{{baseUrl}}/api/courses/{{courseId}}/assignments" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Tarea creada', () => pm.response.to.have.status(201));", "pm.collectionVariables.set('assignmentId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "GET Tareas",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/api/courses/{{courseId}}/assignments" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Tareas listadas', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "GET Detalle tarea",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/api/assignments/{{assignmentId}}" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Detalle de tarea', () => pm.response.to.have.status(200));"] } }]
+        },
+        {
+          "name": "POST Enviar entrega",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"content\":\"Entrega sintética {{runId}}\"}" }, "url": "{{baseUrl}}/api/assignments/{{assignmentId}}/submit" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Entrega enviada', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().status).to.eql('SUBMITTED'); });", "pm.collectionVariables.set('submissionId', pm.response.json().id);"] } }]
+        },
+        {
+          "name": "PATCH Calificar",
+          "request": { "method": "PATCH", "header": [{ "key": "Authorization", "value": "Bearer {{teacherToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"grade\":95,\"feedback\":\"Retroalimentación sintética\"}" }, "url": "{{baseUrl}}/api/submissions/{{submissionId}}/grade" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Entrega calificada', () => { pm.response.to.have.status(200); const b=pm.response.json(); pm.expect(b.status).to.eql('GRADED'); pm.expect(b.grade).to.eql(95); });"] } }]
+        }
+      ]
+    },
+    {
+      "name": "06 Notas seguras",
+      "item": [
+        {
+          "name": "POST Crear nota segura",
+          "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"text\":\"Nota cifrada sintética {{runId}}\"}" }, "url": "{{baseUrl}}/api/security/secure-notes" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Nota segura creada sin payload expuesto', () => { pm.response.to.have.status(201); pm.expect(pm.response.json().encryptedPayload).to.be.undefined; });"] } }]
+        },
+        {
+          "name": "GET Notas seguras",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/api/security/secure-notes" },
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Notas propias descifradas', () => { pm.response.to.have.status(200); pm.expect(pm.response.json()).to.be.an('array').and.not.empty; });"] } }]
+        }
+      ]
+    }
+  ]
+}

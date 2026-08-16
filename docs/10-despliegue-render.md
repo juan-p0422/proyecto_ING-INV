@@ -1,5 +1,7 @@
 # 10. Despliegue local y en Render
 
+La instancia de demostración se publica en [https://eduroom-znb0.onrender.com](https://eduroom-znb0.onrender.com) y su configuración declarativa se conserva en el [repositorio de EduRoom](https://github.com/juan-p0422/proyecto_ING-INV). La disponibilidad y el commit desplegado deben comprobarse nuevamente el día de la presentación.
+
 ## Arquitectura de producción
 
 EduRoom se despliega como una sola aplicación web:

@@ -1,0 +1,333 @@
+{
+  "generatedAt": "2026-08-15T04:17:24.724Z",
+  "source": "https://eduroom-znb0.onrender.com",
+  "browserChannel": "chrome",
+  "syntheticDataOnly": true,
+  "googleClassroomAutomated": false,
+  "artifacts": [
+    {
+      "flow": "login",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/login-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "dashboard",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/dashboard-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "course-stream",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/course-stream-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "classwork",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/classwork-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "people",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/people-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-detail",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/assignment-detail-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "integrity",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/integrity-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-submission",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/assignment-submission-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "login",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/login-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 800,
+        "horizontalOverflow": true
+      }
+    },
+    {
+      "flow": "dashboard",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/dashboard-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "course-stream",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/course-stream-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "classwork",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/classwork-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "people",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/people-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-detail",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/assignment-detail-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "integrity",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/integrity-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-submission",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/assignment-submission-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "login",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/login-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "dashboard",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/dashboard-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "course-stream",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/course-stream-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "classwork",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/classwork-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "people",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/people-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-detail",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/assignment-detail-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "integrity",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/integrity-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-submission",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/assignment-submission-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-graded",
+      "viewport": "1280x720",
+      "file": "evidence/ui/eduroom/assignment-graded-1280x720.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 1280,
+        "viewportHeight": 720,
+        "documentWidth": 1280,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-graded",
+      "viewport": "768x1024",
+      "file": "evidence/ui/eduroom/assignment-graded-768x1024.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 1024,
+        "documentWidth": 768,
+        "horizontalOverflow": false
+      }
+    },
+    {
+      "flow": "assignment-graded",
+      "viewport": "390x844",
+      "file": "evidence/ui/eduroom/assignment-graded-390x844.png",
+      "source": "https://eduroom-znb0.onrender.com",
+      "layout": {
+        "viewportWidth": 390,
+        "viewportHeight": 844,
+        "documentWidth": 390,
+        "horizontalOverflow": false
+      }
+    }
+  ]
+}

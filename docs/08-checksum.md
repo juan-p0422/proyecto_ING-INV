@@ -42,6 +42,15 @@ El repositorio utiliza dos manifestaciones complementarias de SHA-256:
 
 `docs/checksums.sha256` documenta la entrega de fuentes y excluye artefactos regenerables. `integrity-manifest.json` protege específicamente `backend/dist/**/*.js` y `frontend/dist/**/*.{js,css,html}`. Ambos excluyen `.git`, `node_modules` y temporales. Los scripts de fuentes también excluyen `.env` y variantes privadas como `.env.local`, pero conservan los archivos públicos `.env.example`.
 
+No son el mismo manifiesto:
+
+| Manifiesto | Productor | Alcance | Consumidor |
+|---|---|---|---|
+| `docs/checksums.sha256` | `scripts/checksum.ps1` o `scripts/checksum.sh` | Fuentes y documentos entregables, excluyendo secretos y artefactos regenerables | Revisión académica con SHA-256 |
+| `integrity-manifest.json` | `scripts/generate-checksum.js` | Artefactos compilados de backend y frontend | Verificador CLI y verificador de arranque |
+
+El manifest JSON inspeccionado contiene 22 entradas: 19 archivos `.js` del backend y 3 archivos del frontend —un `.js`, un `.css` y `index.html`—. El script CLI verifica las 22. El módulo de arranque filtra solo las 19 entradas JavaScript de `backend/dist`; por eso el endpoint no prueba la integridad runtime del frontend.
+
 Para una entrega académica se generan después de compilar, probar y congelar la versión. Se registran además el commit, la fecha UTC y las versiones de las herramientas.
 
 ### Manifest JSON del build
@@ -96,6 +105,15 @@ El resultado válido muestra el número total de archivos coincidentes. Si falla
 
 Con `STRICT_INTEGRITY=false`, una discrepancia se registra y el servicio continúa con estado `warning`; si falta el manifest, informa `unavailable`. Con `STRICT_INTEGRITY=true`, una discrepancia, un manifest inválido o su ausencia impiden el arranque. De este modo, el modo estricto nunca ejecuta la aplicación sin una comprobación satisfactoria.
 
+| Caso al arrancar | `STRICT_INTEGRITY=false` | `STRICT_INTEGRITY=true` |
+|---|---|---|
+| Manifest válido y backend coincidente | Arranca; estado `verified` | Arranca; estado `verified` |
+| Archivo backend modificado, faltante o nuevo | Registra advertencia; arranca con `warning` | Registra el fallo y no abre el puerto |
+| Manifest ausente | Arranca con `unavailable` | No abre el puerto |
+| JSON o formato inválido | Registra advertencia; arranca con `warning` | No abre el puerto |
+
+El verificador CLI es deliberadamente más estricto: ante cualquier archivo modificado, faltante o nuevo en cualquiera de los scopes termina con código `1`, independientemente de `STRICT_INTEGRITY`.
+
 ### Verificación completa en GNU/Linux
 
 Desde la raíz del repositorio:
@@ -132,7 +150,51 @@ Sobre una copia temporal de la entrega, puede modificarse un archivo de prueba y
 
 > **Espacio de evidencia EV-08-05:** comparación de arranque estricto y no estricto sobre una copia temporal.
 
-## 8.8 Limitaciones
+## 8.8 Comandos mínimos reproducibles
+
+Desde la raíz:
+
+```bash
+# Build normal: útil para validar compilación, pero no aplica ofuscación.
+npm run build
+
+# Build destinado a la entrega educativa.
+npm run build:obfuscated
+
+# Generar el manifest después de la última transformación.
+node scripts/generate-checksum.js
+
+# Comparar artefactos actuales con el manifest congelado.
+node scripts/verify-integrity.js
+
+# Consultar el resumen del despliegue.
+curl https://eduroom-znb0.onrender.com/api/security/integrity
+```
+
+Orden recomendado para una release:
+
+```bash
+npm run build:obfuscated
+node scripts/generate-checksum.js
+node scripts/verify-integrity.js
+```
+
+`npm run build` vuelve a crear el JavaScript normal. Si el manifest se generó después de ofuscar, ejecutar luego el build normal debe provocar una discrepancia; no es un falso positivo, sino una diferencia real de bytes.
+
+## 8.9 Resultado de la auditoría
+
+| Prueba | Resultado | Interpretación |
+|---|---|---|
+| `npm run build` | Aprobada | Backend y frontend compilaron |
+| Verificación contra manifest ofuscado después del build normal | Falló con 1 archivo modificado | Secuencia incorrecta detectada correctamente |
+| `npm run build:obfuscated` | Aprobada; 1 JS transformado | El build educativo es reproducible con la semilla actual |
+| Verificación posterior | Aprobada; 22/22 archivos | Manifest y artefactos coincidieron |
+| Sustitución controlada en copia temporal | Falló; código de salida `1` | Detectó el archivo modificado |
+| Endpoint de Render, 15-08-2026 | `verified`; 19 archivos; 0 discrepancias | El backend desplegado coincidió con sus entradas del manifest |
+
+El campo `checkedAt` del endpoint corresponde a la comprobación de arranque, no necesariamente al instante de cada petición. El estado no está firmado y no identifica el commit desplegado.
+
+## 8.10 Limitaciones
 
 - Si un tercero sustituye tanto los archivos como el manifiesto, puede calcular hashes coherentes nuevos.
 - SHA-256 no aporta confidencialidad, identidad del autor, fecha cierta ni control de acceso.
@@ -140,11 +202,21 @@ Sobre una copia temporal de la entrega, puede modificarse un archivo de prueba y
 - Los archivos excluidos no quedan cubiertos por el manifiesto.
 - Un manifiesto válido no demuestra que el software sea seguro o correcto.
 - La verificación al iniciar no detecta por sí sola cambios realizados después del arranque.
+- El endpoint actual verifica solo el backend; una discrepancia exclusiva del frontend requiere el CLI o una ampliación del módulo runtime.
+- El pipeline de Render usa `npm run build` y `STRICT_INTEGRITY=false`; no regenera el manifest ni bloquea por defecto.
 - El estado público evita hashes completos, pero sigue siendo una señal informativa y no una prueba remota firmada.
 
 Para elevar la confianza, el manifiesto puede firmarse digitalmente y su clave pública o huella debe distribuirse por un canal independiente y confiable. Las evidencias originales también requieren controles de acceso, respaldo y cadena de custodia.
 
-## 8.9 Referencias base
+## 8.11 Recomendaciones
+
+1. Ejecutar `npm run release:educational` en CI y adjuntar el manifest a la misma release.
+2. Verificar también los artefactos del frontend antes de publicar o ampliar el runtime con un alcance explícito.
+3. Activar `STRICT_INTEGRITY=true` únicamente después de probar recuperación y ubicación del manifest en Render.
+4. Firmar el manifest y publicar la huella de la clave por un canal independiente.
+5. Añadir al endpoint un identificador no sensible de versión o commit para correlacionar evidencia.
+
+## 8.12 Referencias base
 
 - NIST FIPS PUB 180-4, *Secure Hash Standard (SHS)*.
 - IETF RFC 6234, algoritmos SHA y HMAC-SHA.

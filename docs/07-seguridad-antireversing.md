@@ -18,6 +18,18 @@ La seguridad principal continúa basada en autenticación, autorización en serv
 | Cliente | `frontend/src/security/clientIntegrity.ts` | Consultar el estado y traducirlo para la interfaz |
 | Ofuscador | `frontend/scripts/obfuscate-build.cjs` | Transformar únicamente el JavaScript del build propio |
 
+### 7.2.1 Estado comprobado de cada mecanismo
+
+| Mecanismo | Estado en el código | Estado en el despliegue declarado | Dictamen |
+|---|---|---|---|
+| Checksum SHA-256 de artefactos | Implementado | El arranque verifica el JavaScript compilado del backend | Implementado con alcance parcial en runtime |
+| Endpoint de integridad | Implementado y público | Respondió `verified`, 19 archivos y 0 discrepancias el 15-08-2026 | Operativo |
+| AES-256-GCM | Implementado y usado por `SecureNote` | `APP_ENCRYPTION_KEY` se genera como secreto en Render | Implementado |
+| Ofuscación del frontend | Implementada como build optativo | `render.yaml` y los Dockerfiles ejecutan el build normal | Disponible, pero no demostrada en el deploy actual |
+| Diagnóstico antidebug | Implementado | Se ejecuta antes de abrir el puerto | Educativo y no bloqueante |
+
+“Implementado” no significa invulnerable. El endpoint público refleja la verificación ejecutada por el backend al arrancar y no acredita que el frontend servido esté ofuscado.
+
 ## 7.3 Archivos protegidos
 
 El manifest cubre artefactos generados, no código propietario de terceros:
@@ -28,6 +40,11 @@ El manifest cubre artefactos generados, no código propietario de terceros:
 - `frontend/dist/**/*.html`.
 
 Se excluyen `.git`, `node_modules`, temporales y extensiones fuera del alcance. Los archivos fuente no se validan al arrancar porque el proceso productivo ejecuta el contenido compilado de `backend/dist`.
+
+Existen dos alcances de verificación:
+
+- `scripts/verify-integrity.js` compara todos los archivos declarados en los scopes; en el manifest auditado fueron 22: 19 JavaScript del backend y 3 artefactos del frontend.
+- `backend/src/security/checksum.ts` filtra únicamente entradas `backend/dist/**/*.js`. Por ello el endpoint informó 19 archivos, aunque el manifest contiene también frontend. Una alteración exclusiva del frontend es detectada por el CLI, pero no por el estado runtime actual.
 
 ## 7.4 Verificación al iniciar
 
@@ -59,7 +76,13 @@ Los estados son `verified`, `warning` y `unavailable`. El reporte interno conser
 
 ## 7.6 Diagnóstico antidebug no destructivo
 
-`antiDebug.ts` registra una advertencia cuando `NODE_ENV` no es `production` y comprueba de forma demostrativa la presencia de variables asociadas a instrumentación de Node. Solo muestra el **nombre** de la variable; nunca su valor.
+`antiDebug.ts` registra una advertencia cuando `NODE_ENV` no es `production` y revisa de forma demostrativa tres variables:
+
+- `NODE_OPTIONS`, solo cuando contiene `--inspect`, `--debug` o `--require`;
+- `VSCODE_INSPECTOR_OPTIONS`, cuando tiene un valor;
+- `NODE_INSPECT_RESUME_ON_START`, cuando tiene un valor.
+
+Solo muestra el **nombre** de la variable; nunca su valor. El reporte se devuelve internamente, pero `server.ts` no lo usa para autorizar, terminar procesos ni exponer información.
 
 Este diagnóstico:
 
@@ -72,7 +95,9 @@ Este diagnóstico:
 
 ## 7.7 Estado visible en el dashboard
 
-El frontend consulta el endpoint al mostrar el dashboard y presenta uno de tres estados: **verificada**, **advertencia** o **no disponible**. Durante la consulta muestra **comprobando**. En producción también se escribe en consola el aviso educativo solicitado.
+El frontend consulta el endpoint al mostrar el dashboard y presenta uno de tres estados: **verificada**, **advertencia** o **no disponible**. Durante la consulta muestra **comprobando**. En producción también se escribe en consola un aviso educativo.
+
+El aviso de `frontend/src/main.tsx` es estático: indica que la protección de integridad está habilitada, pero no detecta por sí mismo DevTools ni una modificación. La señal real del dashboard procede de `GET /api/security/integrity`.
 
 La señal del cliente puede alterarse y es solo informativa. La política estricta se aplica antes del arranque en el backend, donde el usuario del navegador no puede cambiarla.
 
@@ -92,6 +117,8 @@ npm run integrity:verify
 
 El manifest debe generarse **después** de la última transformación. Si se recompila u ofusca nuevamente, los bytes cambian y se requiere un manifest nuevo asociado a esa versión.
 
+El pipeline declarativo actual de Render usa `npm run build`, no `npm run release:educational`. Los Dockerfiles también ejecutan el build normal. Por tanto, no debe afirmarse que la versión pública esté ofuscada sin cambiar el pipeline, desplegar de nuevo y conservar evidencia del artefacto. La recomendación es usar la secuencia educativa en una canalización controlada y, después de validar recuperación, considerar `STRICT_INTEGRITY=true`.
+
 ## 7.9 Reacción ante modificaciones
 
 Una diferencia no implica automáticamente un ataque: también puede deberse a una compilación posterior, cambio de finales de línea, despliegue incompleto o manifest desactualizado. El procedimiento es:
@@ -107,12 +134,24 @@ Una diferencia no implica automáticamente un ataque: también puede deberse a u
 - Un atacante capaz de cambiar archivos y manifest puede generar hashes coherentes.
 - SHA-256 aporta integridad comparativa, no identidad del autor.
 - La comprobación ocurre al arranque; cambios posteriores requieren una nueva verificación o reinicio.
+- La comprobación runtime actual cubre solo JavaScript del backend; el frontend requiere el verificador CLI o ampliar el módulo del servidor.
 - La ofuscación puede revertirse y no protege secretos incluidos por error.
 - El endpoint resume el estado del backend; no vuelve confiable al navegador.
 - Variables de instrumentación son señales débiles y pueden ser legítimas.
 - El control no reemplaza firma digital, arranque verificado, permisos del sistema o monitoreo.
 
-## 7.11 Evidencias sugeridas para presentación
+## 7.11 Resultado de validación del 15-08-2026
+
+- `npm run build`: aprobado; produjo el bundle normal.
+- `npm test`: aprobado; 9 pruebas de backend y 2 de frontend.
+- `npm run build:obfuscated`: aprobado; procesó un archivo JavaScript.
+- `node scripts/verify-integrity.js` después del build ofuscado: aprobado, 22 archivos coincidentes.
+- Prueba controlada sobre una copia temporal: una sustitución produjo código de salida `1` y clasificó un archivo como modificado.
+- Render: `GET /api/security/integrity` devolvió `verified`, `filesChecked=19` y `modifiedFilesCount=0`.
+
+La comprobación evidencia funcionamiento para los casos ejecutados. No es una certificación, no garantiza ausencia de vulnerabilidades y no convierte el endpoint en una atestación remota firmada.
+
+## 7.12 Evidencias sugeridas para presentación
 
 | Evidencia | Demostración segura |
 |---|---|
@@ -127,7 +166,7 @@ Una diferencia no implica automáticamente un ataque: también puede deberse a u
 
 Las pruebas de modificación se realizan sobre una copia temporal de los artefactos propios. No se altera la entrega original ni software de terceros.
 
-## 7.12 Referencias base
+## 7.13 Referencias base
 
 - OWASP Application Security Verification Standard (ASVS).
 - OWASP Password Storage Cheat Sheet.

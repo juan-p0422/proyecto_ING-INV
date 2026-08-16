@@ -10,10 +10,16 @@
     "integrity:verify": "node scripts/verify-integrity.js",
     "release:educational": "npm run build:obfuscated && npm run integrity:generate && npm run integrity:verify",
     "test": "npm --prefix backend test && npm --prefix frontend test",
+    "capture:ui": "node tests/capture-eduroom-ui.js",
+    "ui:capture": "node tests/capture-eduroom-ui.js",
+    "ui:report": "node scripts/generate-ui-comparison-report.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
   }
 }

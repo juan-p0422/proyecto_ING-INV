@@ -51,6 +51,8 @@ EduRoom implementa `encryptText` y `decryptText` en `backend/src/security/crypto
 
 La clave de AES se deriva desde `APP_ENCRYPTION_KEY` mediante `scrypt`, con un contexto fijo de aplicación. La variable debe contener material aleatorio de al menos 32 caracteres y administrarse como secreto. `JWT_SECRET` no se reutiliza.
 
+`APP_ENCRYPTION_KEY` es material de entrada para la derivación, no una clave AES usada directamente. `scryptSync` produce los 32 bytes requeridos por AES-256 usando el contexto fijo `eduroom:aes-256-gcm:v1`. La recomendación operativa es generar 32 bytes aleatorios y guardarlos como 64 caracteres hexadecimales; el esquema de configuración solo exige una longitud mínima de 32 caracteres.
+
 AES-GCM se eligió porque combina cifrado autenticado e integridad del mensaje. A diferencia de un modo de cifrado sin autenticación, una modificación del ciphertext provoca que el descifrado falle en vez de producir silenciosamente texto alterado.
 
 ### 9.3.2 Datos cifrados
@@ -65,6 +67,20 @@ La demostración utiliza la tabla `SecureNote`:
 | `createdAt` | No cifrado; permite orden cronológico |
 
 `POST /api/security/secure-notes` cifra el texto antes de llamar a Prisma. `GET /api/security/secure-notes` filtra primero por el propietario autenticado y solo entonces descifra. El payload cifrado nunca se devuelve al navegador.
+
+El payload persistido tiene esta forma:
+
+```json
+{
+  "version": 1,
+  "algorithm": "aes-256-gcm",
+  "iv": "<12 bytes representados en Base64>",
+  "authTag": "<16 bytes representados en Base64>",
+  "ciphertext": "<bytes cifrados representados en Base64>"
+}
+```
+
+El IV se genera con `randomBytes(12)` para cada operación. Al descifrar se validan versión, algoritmo, tipos, longitud del IV y longitud de la etiqueta. Una clave incorrecta o una alteración del ciphertext/tag provoca un error de autenticación.
 
 ### 9.3.3 Datos que no se cifran
 
@@ -110,7 +126,20 @@ La estrategia de EduRoom busca demostrar capas realistas sin presentar la ofusca
 
 La configuración implementada usa transformaciones moderadas: compactación, nombres hexadecimales y codificación Base64 de parte del arreglo de cadenas. Evita a propósito inyección de código muerto, aplanamiento de flujo y autodefensa, porque añaden coste y fragilidad. Una semilla fija hace reproducible la demostración.
 
+La herramienta instalada durante la auditoría fue `javascript-obfuscator@4.2.2` —el `package.json` declara `^4.1.1`—. El script recorre de forma recursiva `frontend/dist` y transforma únicamente archivos `.js` con:
+
+- `compact: true`;
+- identificadores hexadecimales;
+- arreglo de cadenas habilitado, umbral `0.75` y codificación Base64;
+- semilla fija `20260813`;
+- `controlFlowFlattening`, `deadCodeInjection` y `selfDefending` desactivados;
+- `renameGlobals: false`.
+
+HTML y CSS no se ofuscan. `npm run build:obfuscated` en la raíz compila backend y ejecuta el build ofuscado del frontend; `npm --prefix frontend run build:obfuscated` procesa solo el frontend.
+
 Esta transformación **no es cifrado real**. El navegador recibe código ejecutable y una persona puede estudiarlo o reconstruirlo. Su finalidad es comparar artefactos, enseñar costes de legibilidad y reducir exposición casual; nunca se aplica a código de terceros.
+
+El despliegue declarado en `render.yaml`, `backend/Dockerfile` y `frontend/Dockerfile` usa actualmente `npm run build`, no el script ofuscado. Por tanto, la capacidad está implementada y comprobada localmente, pero no puede presentarse como activa en Render sin modificar la canalización, redesplegar y capturar evidencia del bundle resultante.
 
 ## 9.6 Procedimiento de verificación
 
@@ -126,6 +155,18 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 10. Recuperar la nota mediante `GET /api/security/secure-notes` usando el token de su propietario.
 11. Repetir la consulta con otra cuenta y confirmar que la nota ajena no aparece.
 
+Para verificar la ausencia de texto plano, crear una nota con un marcador sintético único y consultar la base controlada. El valor de `encryptedPayload` debe contener JSON, IV, auth tag y ciphertext, pero no el marcador. La API de creación devuelve solo `id` y `createdAt`; la API de lectura devuelve el texto descifrado porque el propietario autenticado lo necesita.
+
+Pruebas automatizadas:
+
+```bash
+npm --prefix backend test -- crypto.test.ts
+npm run build:obfuscated
+node scripts/verify-integrity.js
+```
+
+Las pruebas de `crypto.test.ts` comprueban ida y vuelta UTF-8, IV distinto para el mismo texto, rechazo de un ciphertext alterado y rechazo de material de clave insuficiente.
+
 > **Espacio de evidencia EV-09-01:** variables configuradas mostrando solo nombres y origen, sin valores.
 
 > **Espacio de evidencia EV-09-02:** salida del build de producción, tamaño de artefactos y ausencia de mapas públicos.
@@ -140,7 +181,19 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 
 > **Espacio de evidencia EV-09-07:** recuperación autorizada de la nota y prueba de aislamiento con un segundo usuario.
 
-## 9.7 Limitaciones reales
+## 9.7 Resultado de validación del 15-08-2026
+
+| Mecanismo | Prueba | Resultado |
+|---|---|---|
+| AES-256-GCM | Cuatro pruebas unitarias específicas | Aprobadas |
+| Uso real | Revisión de rutas y modelo `SecureNote` | Cifra antes de persistir y descifra después de filtrar por propietario |
+| IV | Dos cifrados del mismo texto | IV diferentes |
+| Autenticación GCM | Ciphertext alterado | Descifrado rechazado |
+| Ofuscación | `npm run build:obfuscated` | Aprobada; 1 archivo JavaScript transformado |
+| Integridad post-ofuscación | Verificador CLI | 22/22 archivos coincidentes |
+| Render | Revisión de `render.yaml` | La ofuscación no forma parte del build declarado actual |
+
+## 9.8 Limitaciones reales
 
 - Todo código y dato entregado al navegador debe considerarse observable.
 - Minificar u ofuscar no corrige fallos de autenticación, autorización o validación.
@@ -151,11 +204,24 @@ Esta transformación **no es cifrado real**. El navegador recibe código ejecuta
 - Las dependencias y herramientas de ofuscación pueden introducir vulnerabilidades y requieren mantenimiento.
 - Perder `APP_ENCRYPTION_KEY` implica perder la capacidad de recuperar las notas existentes.
 - El esquema educativo no implementa todavía rotación, versionado de claves ni un KMS/HSM.
+- Todas las notas usan material derivado de una única clave de aplicación y un contexto fijo; no existe clave por usuario o por registro.
+- No se usa AAD en GCM para vincular criptográficamente `ownerId`, `id` o `createdAt` con el ciphertext.
+- El tamaño del ciphertext revela aproximadamente la longitud del texto y los metadatos permanecen visibles.
+- Una nota corrupta puede hacer fallar la respuesta completa de lectura porque el endpoint descifra la colección dentro de una única operación.
 - Los metadatos `ownerId` y `createdAt` permanecen visibles para permitir consultas; cifrar un campo no oculta todos los patrones de uso.
 
 La meta razonable es reducir exposición accidental, preservar secretos del servidor y hacer cumplir permisos aunque se conozca el diseño. No existe una técnica que haga irreversible un cliente web distribuido.
 
-## 9.8 Referencias base
+## 9.9 Recomendaciones
+
+1. Incorporar el build ofuscado a una canalización de release separada y conservar el bundle y su manifest.
+2. Añadir versión de clave a cada payload y un procedimiento de rotación gradual.
+3. Usar un gestor de claves o secretos con auditoría y permisos mínimos.
+4. Considerar AAD para asociar el ciphertext con el propietario y el identificador lógico.
+5. Manejar notas corruptas de forma aislada para no impedir recuperar las demás.
+6. Mantener pruebas que inspeccionen el artefacto y eviten mapas de fuente o secretos `VITE_*`.
+
+## 9.10 Referencias base
 
 - OWASP, *Cryptographic Storage Cheat Sheet*.
 - OWASP, *Password Storage Cheat Sheet*.
