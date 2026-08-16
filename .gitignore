@@ -10,3 +10,16 @@ coverage/
 .vscode/
 backend/prisma/dev.db
 
+docs/
+evidence/**/*.md
+evidence/**/*.png
+evidence/**/*.jpg
+evidence/**/*.jpeg
+evidence/**/*.webp
+evidence/**/*.gif
+evidence/**/*.bmp
+evidence/**/*.tif
+evidence/**/*.tiff
+evidence/final-pdf/*
+!evidence/final-pdf/.gitkeep
+tmp/
