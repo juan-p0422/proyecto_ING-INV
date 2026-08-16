@@ -2,14 +2,14 @@ import { app } from './app';
 import { env } from './config';
 import { prisma } from './lib/prisma';
 import { runDefensiveDiagnostics } from './security/antiDebug';
-import { verifyBackendIntegrity } from './security/checksum';
+import { verifyRuntimeIntegrity } from './security/checksum';
 
 let server: ReturnType<typeof app.listen> | undefined;
 
 async function bootstrap() {
   runDefensiveDiagnostics();
   try {
-    await verifyBackendIntegrity({ strict: env.STRICT_INTEGRITY, manifestPath: env.INTEGRITY_MANIFEST_PATH });
+    await verifyRuntimeIntegrity({ strict: env.STRICT_INTEGRITY, manifestPath: env.INTEGRITY_MANIFEST_PATH });
   } catch (error) {
     console.error(`[startup] ${error instanceof Error ? error.message : 'Fallo de integridad.'}`);
     await prisma.$disconnect();

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "algorithm": "sha256",
-  "generatedAt": "2026-08-14T03:13:43.110Z",
+  "generatedAt": "2026-08-16T07:24:22.904Z",
   "scopes": [
     {
       "root": "backend/dist",
@@ -101,8 +101,8 @@
     },
     {
       "path": "backend/dist/src/security/checksum.js",
-      "sha256": "de60873549426f4c3a9606f73f7eefd9d062b7ce0cb1f70370f3e79b7ea6e3e7",
-      "size": 6566
+      "sha256": "94544ab42d9c41b43f1f9e16743b47ee8f74368637774755fa8660e3c9f98ea2",
+      "size": 7047
     },
     {
       "path": "backend/dist/src/security/crypto.js",
@@ -111,7 +111,7 @@
     },
     {
       "path": "backend/dist/src/server.js",
-      "sha256": "b963411ce0bf290ce72993b83b4f563c4770fe37db573e926eb50ac50e742b68",
+      "sha256": "72ce1185e45ea9f74e41dccc844cc9644ebc3225b455178fc7e981b387a72db1",
       "size": 1192
     },
     {

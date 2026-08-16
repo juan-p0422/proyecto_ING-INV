@@ -1,309 +1,269 @@
-# Comparativo visual de interfaces: Google Classroom observado vs EduRoom
+# Comparativo visual de UIs: Google Classroom observado vs EduRoom
+
+**Referencia pública observada vs réplica académica independiente**<br>
+**Fecha:** 16-08-2026 (`America/Mexico_City`)<br>
+**Deploy de EduRoom:** <https://eduroom-znb0.onrender.com><br>
+**Repositorio:** <https://github.com/juan-p0422/proyecto_ING-INV>
 
 ## 16.1 Propósito
 
-Este documento compara la **estructura, jerarquía, navegación y correspondencia de flujos** de una referencia pública observada —Google Classroom— y la réplica académica independiente EduRoom. No se busca equivalencia pixel a pixel ni reproducir la identidad visual propietaria.
+El comparativo estudia composición, navegación, jerarquía, densidad, flujos, responsividad aproximada y correspondencia funcional. Google Classroom funciona como referencia manual observada; EduRoom es una réplica académica independiente implementada con identidad y código propios.
 
-EduRoom usa nombre, marca, paleta, componentes, textos y código propios. No incorpora logos, assets, iconografía propietaria, tipografías remotas, textos comerciales ni colores exactos de Google. Las coincidencias se evalúan como patrones funcionales generales de una plataforma LMS.
+La evaluación no mide parecido pixel a pixel. **Alta** indica que se conserva el objetivo, jerarquía y flujo principal; **Media**, que se conserva el objetivo con cambios relevantes; **Baja**, que solo existe correspondencia parcial; y **No aplicable**, que el elemento es exclusivo de uno de los productos.
 
-Recursos del proyecto: [EduRoom en Render](https://eduroom-znb0.onrender.com) · [repositorio](https://github.com/juan-p0422/proyecto_ING-INV).
+## 16.2 Nota de autorización de evidencias
 
-## 16.2 Alcance
+> Las capturas de Google Classroom corresponden a evidencia manual obtenida desde cuentas personales/controladas por el alumno. El alumno autorizó su inclusión sin anonimización adicional. Se usan exclusivamente con fines académicos para demostrar flujos, estructura y comportamiento observable.
 
-Se comparan los siguientes flujos:
+Las imágenes conservan su resolución original de 1919 × 1079 y no fueron anonimizadas, censuradas, modificadas, eliminadas ni reemplazadas. Su resolución se acepta como **referencia manual de escritorio**. Google Classroom no fue abierto ni automatizado por scripts del proyecto.
 
-1. login o pantalla inicial;
-2. dashboard o listado de cursos;
-3. vista de curso y tablón;
-4. trabajo de clase y tareas;
-5. detalle de tarea;
-6. personas o miembros;
-7. entrega de tarea;
-8. calificación y retroalimentación;
-9. estado de integridad de EduRoom, sin equivalente requerido en la referencia.
+## 16.3 Límites
 
-La observación de Google Classroom debe realizarla manualmente el alumno con una cuenta controlada y contenido sintético. La automatización incluida en el repositorio abre exclusivamente EduRoom.
+- No se copian marcas, logos o identidad de Google dentro de EduRoom.
+- No se copian recursos visuales o assets de Google en la réplica.
+- No se copian textos propietarios como contenido de EduRoom.
+- No se afirma equivalencia pixel a pixel.
+- Las capturas de referencia conservan su resolución original y se usan como evidencia funcional.
+- Los viewports 1280 × 720, 768 × 1024 y 390 × 844 se aplican a EduRoom para demostrar su respuesta multiplataforma, no para invalidar la referencia manual.
+- Las capturas dinámicas describen observación desde DevTools y no implican acceso a código, servidores o información interna de Google.
 
-## 16.3 Viewports y protocolo común
+## 16.4 Capturas detectadas y clasificación
 
-| Dispositivo | Viewport CSS | Objetivo |
-|---|---:|---|
-| Escritorio | 1280 × 720 | Navegación completa, distribución multicolumna y contenido sobre el pliegue |
-| Tableta | 768 × 1024 | Reacomodo de tarjetas, jerarquía intermedia y legibilidad táctil |
-| Móvil | 390 × 844 | Apilamiento, navegación compacta, controles táctiles y ausencia de desbordamiento |
+### 16.4.1 Google Classroom
 
-Para que el par sea comparable, ambas capturas deben utilizar el mismo viewport, zoom 100 %, tema claro, idioma consistente y un estado funcional equivalente. Deben anotarse fecha, navegador, rol y origen.
+| Archivo | Ruta | Resolución | Flujo asignado | Estado | Observación |
+|---|---|---:|---|---|---|
+| `GC-01-login-o-inicio.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Login / Inicio | Usada | Captura funcional más cercana: muestra el inicio autenticado/dashboard |
+| `GC-02-dashboard-clase.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Dashboard de cursos | Usada | Referencia manual observada en resolución original |
+| `GC-03-crear-clase.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Creación de clase | Usada | Modal de creación con datos de clase controlada |
+| `GC-04-tablon.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Tablón del curso | Usada | Contexto, pestañas, encabezado y acciones docentes |
+| `GC-05-trabajo-clase.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Trabajo de clase | Usada | Editor de tarea como captura funcional equivalente al flujo docente |
+| `GC-06-detalle-tarea.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Detalle de tarea | Usada | Vista de instrucciones y comentarios |
+| `GC-07-entrega-tarea.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Entrega de tarea | Usada | Estado entregado y panel de trabajo |
+| `GC-08-personas.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Personas / miembros | Usada | Agrupación profesores/estudiantes |
+| `GC-09-calificaciones.png` | `evidence/ui/google-classroom/` | 1919 × 1079 | Calificaciones | Usada | Libro de calificaciones y promedio |
+| `GC-DYN-01-network-xhr.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | DevTools Network | Usada | Fetch/XHR, estados, tamaños y tiempos |
+| `GC-DYN-02-network-status-codes.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | DevTools Network | Complementaria | Inventario general de recursos y códigos |
+| `GC-DYN-03-application-storage.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | DevTools Application | Requiere revisión | Contiene valores visibles de cookies; no exportar/proyectar hasta invalidar sesiones o preparar una edición segura autorizada |
+| `GC-DYN-04-service-workers-cache.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | DevTools Application | Complementaria | Service workers/cache del entorno observado |
+| `GC-DYN-05-performance-summary.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | Performance | Usada | Traza y resumen de interacción |
+| `GC-DYN-06-memory-summary.png` | `evidence/dynamic/google-classroom/` | 1919 × 1079 | Memory | Usada | Resumen manual de heap snapshot |
 
-Las 27 capturas de EduRoom fueron obtenidas el 14-08-2026 desde Render mediante `tests/capture-eduroom-ui.js`. El manifiesto de procedencia está en [`evidence/ui/eduroom/capture-manifest.json`](../evidence/ui/eduroom/capture-manifest.json).
+### 16.4.2 EduRoom
 
-## 16.4 Escala de evaluación manual
+| Flujo | Escritorio | Tableta | Móvil | Estado |
+|---|---|---|---|---|
+| Login / Inicio | `01-login--desktop-1280x720.png` | `01-login--tablet-768x1024.png` | `01-login--mobile-390x844.png` | Usada |
+| Dashboard | `02-dashboard-cursos--desktop-1280x720.png` | `02-dashboard-cursos--tablet-768x1024.png` | `02-dashboard-cursos--mobile-390x844.png` | Usada |
+| Curso / Tablón | `03-curso-tablon--desktop-1280x720.png` | `03-curso-tablon--tablet-768x1024.png` | `03-curso-tablon--mobile-390x844.png` | Usada |
+| Trabajo de clase | `04-trabajo-clase--desktop-1280x720.png` | `04-trabajo-clase--tablet-768x1024.png` | `04-trabajo-clase--mobile-390x844.png` | Usada |
+| Personas | `05-personas--desktop-1280x720.png` | `05-personas--tablet-768x1024.png` | `05-personas--mobile-390x844.png` | Usada |
+| Detalle de tarea | `06-detalle-tarea--desktop-1280x720.png` | `06-detalle-tarea--tablet-768x1024.png` | `06-detalle-tarea--mobile-390x844.png` | Usada |
+| Entrega | `07-entrega--desktop-1280x720.png` | `07-entrega--tablet-768x1024.png` | `07-entrega--mobile-390x844.png` | Usada |
+| Calificaciones | `08-calificacion-retroalimentacion--desktop-1280x720.png` | `08-calificacion-retroalimentacion--tablet-768x1024.png` | `08-calificacion-retroalimentacion--mobile-390x844.png` | Usada |
+| Seguridad / integridad | `09-integridad--desktop-1280x720.png` | `09-integridad--tablet-768x1024.png` | `09-integridad--mobile-390x844.png` | Usada |
 
-| Nivel | Definición |
-|---|---|
-| **Alta** | El mismo objetivo, jerarquía y recorrido principal son reconocibles; las diferencias no obstaculizan la tarea |
-| **Media** | La función existe y es comprensible, pero cambia la densidad, ubicación, cantidad de pasos o respuesta adaptable |
-| **Baja** | Solo hay correspondencia conceptual parcial o el flujo requiere una estrategia sustancialmente distinta |
-| **No aplicable** | No existe equivalente, quedó fuera de alcance o se trata de una función propia de seguridad |
+Además de la serie seleccionada anterior, la carpeta contiene una serie previa de 27 PNG registrada en `capture-manifest.json`. Se conserva como evidencia complementaria y trazable; no se cuenta como 27 flujos adicionales ni sustituye los pares principales. Cada patrón de la tabla representa sus tres archivos de escritorio, tableta y móvil.
 
-La escala no califica parecido estético. Una identidad visual distinta es un resultado deliberado y favorable para la independencia del proyecto.
-
-## 16.5 Tabla de pares visuales
-
-“Referencia pendiente” significa que el alumno debe añadir una captura propia anonimizada en `evidence/ui/google-classroom/`; no autoriza a ningún script a obtenerla.
-
-| Flujo | Viewport | Referencia observada | Réplica EduRoom | Criterio comparado | Resultado |
+| Archivo | Ruta | Resolución | Flujo asignado | Estado | Observación |
 |---|---|---|---|---|---|
-| Login / inicio | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/01-login--desktop-1280x720.png) | Jerarquía, acceso y llamada principal | Par pendiente; EduRoom disponible |
-| Login / inicio | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/01-login--tablet-768x1024.png) | Reacomodo del panel | Par pendiente; EduRoom disponible |
-| Login / inicio | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/01-login--mobile-390x844.png) | Legibilidad y formulario táctil | Par pendiente; EduRoom disponible |
-| Dashboard de cursos | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png) | Colección, acción primaria y tarjetas | Par pendiente; EduRoom disponible |
-| Dashboard de cursos | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--tablet-768x1024.png) | Rejilla y prioridades | Par pendiente; EduRoom disponible |
-| Dashboard de cursos | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--mobile-390x844.png) | Apilamiento y acciones por rol | Par pendiente; EduRoom disponible |
-| Curso / tablón | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/03-curso-tablon--desktop-1280x720.png) | Contexto, pestañas y flujo | Par pendiente; EduRoom disponible |
-| Curso / tablón | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/03-curso-tablon--tablet-768x1024.png) | Navegación y columnas | Par pendiente; EduRoom disponible |
-| Curso / tablón | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/03-curso-tablon--mobile-390x844.png) | Encabezado y contenido apilado | Par pendiente; EduRoom disponible |
-| Trabajo de clase | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/04-trabajo-clase--desktop-1280x720.png) | Lista de actividades y estado | Par pendiente; EduRoom disponible |
-| Trabajo de clase | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/04-trabajo-clase--tablet-768x1024.png) | Densidad de filas | Par pendiente; EduRoom disponible |
-| Trabajo de clase | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/04-trabajo-clase--mobile-390x844.png) | Lectura y acceso táctil | Par pendiente; EduRoom disponible |
-| Detalle de tarea | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/06-detalle-tarea--desktop-1280x720.png) | Instrucciones, fecha y revisión | Par pendiente; EduRoom disponible |
-| Detalle de tarea | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/06-detalle-tarea--tablet-768x1024.png) | Separación de contenido | Par pendiente; EduRoom disponible |
-| Detalle de tarea | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/06-detalle-tarea--mobile-390x844.png) | Orden de lectura | Par pendiente; EduRoom disponible |
-| Personas / miembros | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/05-personas--desktop-1280x720.png) | Agrupación docente/estudiante | Par pendiente; EduRoom disponible |
-| Personas / miembros | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/05-personas--tablet-768x1024.png) | Tarjetas de integrantes | Par pendiente; EduRoom disponible |
-| Personas / miembros | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/05-personas--mobile-390x844.png) | Privacidad y apilamiento | Par pendiente; EduRoom disponible |
-| Entrega | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/07-entrega--desktop-1280x720.png) | Estado y editor de respuesta | Par pendiente; EduRoom disponible |
-| Entrega | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/07-entrega--tablet-768x1024.png) | Jerarquía instrucciones/trabajo | Par pendiente; EduRoom disponible |
-| Entrega | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/07-entrega--mobile-390x844.png) | Flujo vertical y estado | Par pendiente; EduRoom disponible |
-| Calificación / feedback | 1280×720 | Referencia pendiente | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--desktop-1280x720.png) | Nota, estado y feedback | Par pendiente; EduRoom disponible |
-| Calificación / feedback | 768×1024 | Referencia pendiente | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--tablet-768x1024.png) | Visibilidad del resultado | Par pendiente; EduRoom disponible |
-| Calificación / feedback | 390×844 | Referencia pendiente | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--mobile-390x844.png) | Lectura móvil de resultado | Par pendiente; EduRoom disponible |
-| Estado de integridad | 1280×720 | No aplicable | [Captura](../evidence/ui/eduroom/09-integridad--desktop-1280x720.png) | Estado propio de seguridad | Evidencia EduRoom completa |
-| Estado de integridad | 768×1024 | No aplicable | [Captura](../evidence/ui/eduroom/09-integridad--tablet-768x1024.png) | Estado propio de seguridad | Evidencia EduRoom completa |
-| Estado de integridad | 390×844 | No aplicable | [Captura](../evidence/ui/eduroom/09-integridad--mobile-390x844.png) | Estado propio de seguridad | Evidencia EduRoom completa |
+| `login-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Login / Inicio | Complementaria | Serie registrada en el manifiesto; el escritorio coincide binariamente con la serie seleccionada |
+| `dashboard-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Dashboard | Complementaria | Serie registrada en el manifiesto |
+| `course-stream-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Curso / Tablón | Complementaria | Variante previa conservada |
+| `classwork-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Trabajo de clase | Complementaria | Variante previa conservada |
+| `people-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Personas | Complementaria | Variante previa conservada |
+| `assignment-detail-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Detalle de tarea | Complementaria | Variante previa conservada |
+| `assignment-submission-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Entrega | Complementaria | Serie registrada en el manifiesto |
+| `assignment-graded-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Calificaciones | Complementaria | Serie registrada en el manifiesto |
+| `integrity-{1280x720,768x1024,390x844}.png` | `evidence/ui/eduroom/` | Tres viewports | Seguridad / integridad | Complementaria | Serie registrada en el manifiesto |
+| `capture-manifest.json` | `evidence/ui/eduroom/` | No aplicable | Trazabilidad | Complementaria | Registra fuente, fecha, viewport y ausencia de automatización de Classroom |
 
-## 16.6 Plantillas de análisis por flujo
+En total se detectaron **54 PNG de EduRoom**: 27 seleccionados para el comparativo y 27 complementarios. Esta distinción evita inflar el número de flujos demostrados.
 
-### 16.6.1 Login / inicio
+## 16.5 Matriz comparativa flexible por flujo
 
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — añadir captura manual propia y anonimizada de la pantalla inicial autorizada.
+| Flujo | Captura Google Classroom disponible | Resolución Classroom | Captura EduRoom disponible | Resolución EduRoom | Criterio comparado | Similitud funcional | Diferencias deliberadas | Resultado |
+|---|---|---:|---|---:|---|---|---|---|
+| Login / Inicio | `GC-01-login-o-inicio.png` | 1919 × 1079 | `01-login--desktop-1280x720.png` | 1280 × 720 | Entrada y orientación inicial | Ambas conducen al entorno educativo | Classroom muestra inicio ya autenticado; EduRoom muestra formulario y registro propios | **Baja** |
+| Dashboard de cursos | `GC-02-dashboard-clase.png` | 1919 × 1079 | `02-dashboard-cursos--desktop-1280x720.png` | 1280 × 720 | Colección, navegación y acciones | Curso como unidad principal y acceso por tarjeta | Navegación, tarjetas, paleta y panel de integridad propios | **Alta** |
+| Creación de clase | `GC-03-crear-clase.png` | 1919 × 1079 | `02-dashboard-cursos--desktop-1280x720.png` | 1280 × 720 | Acción docente de crear curso | Ambos exponen creación desde el dashboard | Classroom muestra modal; EduRoom evidencia la acción próxima pero no el modal en esta captura | **Media** |
+| Tablón del curso | `GC-04-tablon.png` | 1919 × 1079 | `03-curso-tablon--desktop-1280x720.png` | 1280 × 720 | Contexto, pestañas y publicaciones | Contexto persistente y comunicación del curso | Encabezado, componentes, copy y densidad propios | **Alta** |
+| Trabajo de clase | `GC-05-trabajo-clase.png` | 1919 × 1079 | `04-trabajo-clase--desktop-1280x720.png` | 1280 × 720 | Gestión docente de actividades | Centralización de tareas y acción de creación | Referencia muestra editor; EduRoom muestra listado y menor complejidad | **Media** |
+| Detalle de tarea | `GC-06-detalle-tarea.png` | 1919 × 1079 | `06-detalle-tarea--desktop-1280x720.png` | 1280 × 720 | Título, instrucciones, estado y comentarios | Actividad como centro del flujo | EduRoom usa paneles, textos y alcance propios | **Alta** |
+| Entrega de tarea | `GC-07-entrega-tarea.png` | 1919 × 1079 | `07-entrega--desktop-1280x720.png` | 1280 × 720 | Trabajo enviado, estado y acción | Cambio de estado visible y vínculo con la tarea | EduRoom prioriza respuesta textual y no replica integraciones | **Alta** |
+| Personas / miembros | `GC-08-personas.png` | 1919 × 1079 | `05-personas--desktop-1280x720.png` | 1280 × 720 | Agrupación y roles | Separación de profesores y estudiantes | EduRoom usa tarjetas y avatares tipográficos propios | **Alta** |
+| Calificaciones | `GC-09-calificaciones.png` | 1919 × 1079 | `08-calificacion-retroalimentacion--desktop-1280x720.png` | 1280 × 720 | Nota, escala y lectura del resultado | Evaluación asociada al trabajo | Classroom presenta libro agregado; EduRoom prioriza nota/feedback individual | **Media** |
+| Seguridad / integridad | No existe equivalente requerido | No aplicable | `09-integridad--desktop-1280x720.png` | 1280 × 720 | Estado defensivo propio | No se evalúa similitud | Función académica exclusiva de EduRoom | **No aplicable** |
 
-**Captura EduRoom:**  
-![Login de EduRoom en escritorio](../evidence/ui/eduroom/01-login--desktop-1280x720.png)
+Referencia manual observada en resolución original; se usa como evidencia funcional, no como comparación pixel a pixel.
 
-**Qué comparar:** claridad del propósito, campos, acción principal, alternativa de registro y respuesta móvil.
+## 16.6 Comparaciones visuales por flujo
 
-**Similitudes funcionales:** punto de entrada autenticado y separación entre identificación y contenido privado.
+### 16.6.1 Login / Inicio — captura funcional equivalente
 
-**Diferencias deliberadas:** EduRoom presenta narrativa, marca y composición propias; utiliza registro interno en lugar de identidad Google.
+| Google Classroom: inicio autenticado | EduRoom: acceso público |
+|---|---|
+| ![Inicio manual de Classroom](../evidence/ui/google-classroom/GC-01-login-o-inicio.png) | ![Login de EduRoom](../evidence/ui/eduroom/01-login--desktop-1280x720.png) |
 
-**Resultado académico:** correspondencia funcional estimada **Alta**; comparación visual final pendiente de referencia autorizada.
+- **Qué comparar:** orientación inicial, navegación hacia cursos y prioridad de acceso.
+- **Similitudes:** ambos son puntos de entrada al ecosistema educativo.
+- **Diferencias deliberadas:** la referencia está autenticada; EduRoom presenta autenticación/registro con narrativa propia.
+- **Resultado:** **Baja**, porque el estado exacto difiere, aunque la captura es funcionalmente cercana.
 
 ### 16.6.2 Dashboard de cursos
 
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — lista de clases con nombres, códigos, personas y fotos ocultos.
+| Google Classroom: referencia manual de escritorio | EduRoom: escritorio 1280 × 720 |
+|---|---|
+| ![Dashboard manual de Classroom](../evidence/ui/google-classroom/GC-02-dashboard-clase.png) | ![Dashboard de EduRoom](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png) |
 
-**Captura EduRoom:**  
-![Dashboard de EduRoom](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png)
+- **Qué comparar:** composición general, colección de cursos, navegación y acciones.
+- **Similitudes:** curso como unidad visual principal y acceso directo.
+- **Diferencias deliberadas:** EduRoom usa layout, tarjetas, paleta, textos e integridad propios.
+- **Resultado:** **Alta**.
 
-**Qué comparar:** colección de cursos, acción crear/unirse, información resumida y prioridad de navegación.
+### 16.6.3 Creación de clase — captura funcional equivalente
 
-**Similitudes funcionales:** tarjeta como acceso a un espacio académico y acción condicionada por rol.
+| Google Classroom: creación manual | EduRoom: dashboard con acción docente |
+|---|---|
+| ![Crear clase en Classroom](../evidence/ui/google-classroom/GC-03-crear-clase.png) | ![Dashboard docente de EduRoom](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png) |
 
-**Diferencias deliberadas:** tarjetas, copy, paleta, monogramas y panel de integridad originales.
+- **Qué comparar:** descubrimiento de la acción y datos mínimos del curso.
+- **Similitudes:** creación disponible desde el contexto principal del docente.
+- **Diferencias deliberadas:** el modal de EduRoom no está capturado; su modelo y campos son propios.
+- **Resultado:** **Media**.
 
-**Resultado académico:** correspondencia de navegación **Alta**; identidad visual independiente.
+### 16.6.4 Tablón del curso
 
-### 16.6.3 Vista de curso / tablón
+| Google Classroom: referencia manual | EduRoom: escritorio 1280 × 720 |
+|---|---|
+| ![Tablón manual de Classroom](../evidence/ui/google-classroom/GC-04-tablon.png) | ![Tablón de EduRoom](../evidence/ui/eduroom/03-curso-tablon--desktop-1280x720.png) |
 
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — tablón de una clase sintética y controlada.
+- **Qué comparar:** contexto, pestañas, publicaciones y acciones docentes.
+- **Similitudes:** navegación contextual y comunicación dentro del curso.
+- **Diferencias deliberadas:** encabezado editorial, tarjetas y copy originales.
+- **Resultado:** **Alta**.
 
-**Captura EduRoom:**  
-![Tablón de EduRoom](../evidence/ui/eduroom/03-curso-tablon--desktop-1280x720.png)
+### 16.6.5 Trabajo de clase — captura funcional equivalente
 
-**Qué comparar:** contexto del curso, navegación secundaria, publicaciones y comentarios.
+| Google Classroom: editor de tarea | EduRoom: listado de actividades |
+|---|---|
+| ![Trabajo de clase manual](../evidence/ui/google-classroom/GC-05-trabajo-clase.png) | ![Trabajo de clase de EduRoom](../evidence/ui/eduroom/04-trabajo-clase--desktop-1280x720.png) |
 
-**Similitudes funcionales:** curso persistente, pestañas y flujo cronológico de comunicación.
+- **Qué comparar:** gestión de actividades, jerarquía de datos y acción docente.
+- **Similitudes:** tareas centralizadas dentro del curso.
+- **Diferencias deliberadas:** la referencia muestra creación detallada; EduRoom evidencia listado y menor complejidad.
+- **Resultado:** **Media**.
 
-**Diferencias deliberadas:** encabezado editorial de gran escala, navegación y componentes desarrollados para EduRoom. El código activo aparece difuminado en la evidencia.
+### 16.6.6 Detalle de tarea
 
-**Resultado académico:** correspondencia estructural **Alta** y densidad sobre el pliegue **Media** por el tamaño deliberado del encabezado.
+| Google Classroom: referencia manual | EduRoom: escritorio 1280 × 720 |
+|---|---|
+| ![Detalle manual de Classroom](../evidence/ui/google-classroom/GC-06-detalle-tarea.png) | ![Detalle de EduRoom](../evidence/ui/eduroom/06-detalle-tarea--desktop-1280x720.png) |
 
-### 16.6.4 Trabajo de clase / tareas
-
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — trabajo de clase con actividad y contenido sintéticos.
-
-**Captura EduRoom:**  
-![Trabajo de clase de EduRoom](../evidence/ui/eduroom/04-trabajo-clase--desktop-1280x720.png)
-
-**Qué comparar:** agrupación de actividades, estado, fecha, descripción y acción docente.
-
-**Similitudes funcionales:** acceso desde el curso y lista de tareas navegables.
-
-**Diferencias deliberadas:** EduRoom no reproduce temas, rúbricas, adjuntos reales ni taxonomías comerciales.
-
-**Resultado académico:** correspondencia funcional **Alta**; profundidad del LMS **Media**.
-
-### 16.6.5 Detalle de tarea
-
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — tarea propia, sin comentarios, archivos o identidades reales.
-
-**Captura EduRoom:**  
-![Detalle de tarea de EduRoom](../evidence/ui/eduroom/06-detalle-tarea--desktop-1280x720.png)
-
-**Qué comparar:** título, instrucciones, fecha, contexto, entrega y revisión.
-
-**Similitudes funcionales:** una actividad centraliza instrucciones y estados dependientes del rol.
-
-**Diferencias deliberadas:** la réplica admite respuesta textual, no carga binaria, rúbricas o integración externa.
-
-**Resultado académico:** jerarquía **Alta**; amplitud funcional **Media**.
-
-### 16.6.6 Personas / miembros
-
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — usar cuentas sintéticas; ocultar nombre, correo y fotografía incluso si pertenecen al alumno.
-
-**Captura EduRoom:**  
-![Personas de EduRoom](../evidence/ui/eduroom/05-personas--desktop-1280x720.png)
-
-**Qué comparar:** separación de docentes y estudiantes, conteo, etiquetas y adaptación.
-
-**Similitudes funcionales:** agrupación explícita por función dentro del curso.
-
-**Diferencias deliberadas:** avatares tipográficos propios y tarjetas originales. Los correos se difuminan durante la captura automática.
-
-**Resultado académico:** correspondencia de jerarquía **Alta**.
+- **Qué comparar:** título, instrucciones, metadatos, comentarios y estado.
+- **Similitudes:** una actividad concentra contexto y siguientes acciones.
+- **Diferencias deliberadas:** estructura interna, textos y componentes propios.
+- **Resultado:** **Alta**.
 
 ### 16.6.7 Entrega de tarea
 
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — entrega sintética sin archivos personales ni historial identificable.
+| Google Classroom: referencia manual | EduRoom: escritorio 1280 × 720 |
+|---|---|
+| ![Entrega manual de Classroom](../evidence/ui/google-classroom/GC-07-entrega-tarea.png) | ![Entrega de EduRoom](../evidence/ui/eduroom/07-entrega--desktop-1280x720.png) |
 
-**Captura EduRoom:**  
-![Entrega en EduRoom](../evidence/ui/eduroom/07-entrega--desktop-1280x720.png)
+- **Qué comparar:** estado entregado, trabajo asociado y reversibilidad.
+- **Similitudes:** cambio de estado visible vinculado a la tarea.
+- **Diferencias deliberadas:** EduRoom usa contenido textual sintético y no replica adjuntos/integraciones.
+- **Resultado:** **Alta**.
 
-**Qué comparar:** estado pendiente/entregado, control de envío, respuesta y posibilidad de actualización.
+### 16.6.8 Personas / miembros
 
-**Similitudes funcionales:** la entrega pertenece a un estudiante y una tarea y muestra estado visible.
+| Google Classroom: referencia manual | EduRoom: escritorio 1280 × 720 |
+|---|---|
+| ![Personas manual de Classroom](../evidence/ui/google-classroom/GC-08-personas.png) | ![Personas de EduRoom](../evidence/ui/eduroom/05-personas--desktop-1280x720.png) |
 
-**Diferencias deliberadas:** EduRoom usa texto directo y no replica integración con almacenamiento de terceros.
+- **Qué comparar:** agrupación por rol, conteos y densidad.
+- **Similitudes:** profesores y estudiantes se presentan en secciones diferenciadas.
+- **Diferencias deliberadas:** EduRoom usa tarjetas y avatares tipográficos propios.
+- **Resultado:** **Alta**.
 
-**Resultado académico:** correspondencia de flujo **Alta**; tipos de entrega **Baja** por alcance deliberado.
+### 16.6.9 Calificaciones
 
-### 16.6.8 Calificación / retroalimentación
+| Google Classroom: libro de calificaciones | EduRoom: resultado individual |
+|---|---|
+| ![Calificaciones manual de Classroom](../evidence/ui/google-classroom/GC-09-calificaciones.png) | ![Calificación de EduRoom](../evidence/ui/eduroom/08-calificacion-retroalimentacion--desktop-1280x720.png) |
 
-**Captura de referencia observada:**  
-> ESPACIO RESERVADO — calificación ficticia y comentarios sin datos personales.
+- **Qué comparar:** nota, escala, estado y vínculo con la actividad.
+- **Similitudes:** la evaluación cierra el ciclo de trabajo.
+- **Diferencias deliberadas:** Classroom agrega resultados; EduRoom prioriza nota y feedback individual.
+- **Resultado:** **Media**.
 
-**Captura EduRoom:**  
-![Calificación en EduRoom](../evidence/ui/eduroom/08-calificacion-retroalimentacion--desktop-1280x720.png)
+### 16.6.10 Seguridad / integridad, elemento propio
 
-**Qué comparar:** nota, escala, estado y retroalimentación legible para el estudiante.
+| Google Classroom | EduRoom |
+|---|---|
+| **No aplicable:** no se busca equivalente. | ![Integridad de EduRoom](../evidence/ui/eduroom/09-integridad--desktop-1280x720.png) |
 
-**Similitudes funcionales:** transición de entregada a calificada y retorno de feedback.
+- **Qué comparar:** no es un par; documenta una función defensiva propia.
+- **Similitudes:** no evaluadas.
+- **Diferencias deliberadas:** resumen no sensible del checksum incorporado por EduRoom.
+- **Resultado:** **No aplicable**.
 
-**Diferencias deliberadas:** escala fija 0–100; no hay rúbricas, ponderaciones ni libro de calificaciones.
+## 16.7 Evidencia dinámica complementaria de Classroom
 
-**Resultado académico:** correspondencia del flujo básico **Alta**; profundidad evaluativa **Baja**.
+| Network Fetch/XHR | Network y códigos de estado |
+|---|---|
+| ![Network XHR manual](../evidence/dynamic/google-classroom/GC-DYN-01-network-xhr.png) | ![Network status manual](../evidence/dynamic/google-classroom/GC-DYN-02-network-status-codes.png) |
 
-### 16.6.9 Estado de integridad
+| Application / almacenamiento | Service workers / cache |
+|---|---|
+| **[EVIDENCIA EN REVISIÓN]** `GC-DYN-03-application-storage.png` se conserva como original autorizado, pero no se incrusta en la versión de entrega por cookies visibles. | ![Service workers manual](../evidence/dynamic/google-classroom/GC-DYN-04-service-workers-cache.png) |
 
-**Captura de referencia observada:**  
-> NO APLICABLE — no se busca ni se solicita un equivalente en Google Classroom.
+| Performance | Memory |
+|---|---|
+| ![Performance manual](../evidence/dynamic/google-classroom/GC-DYN-05-performance-summary.png) | ![Memory manual](../evidence/dynamic/google-classroom/GC-DYN-06-memory-summary.png) |
 
-**Captura EduRoom:**  
-![Estado de integridad en EduRoom](../evidence/ui/eduroom/09-integridad--desktop-1280x720.png)
+Estas capturas complementan el análisis de comportamiento observable; no se usan para afirmar equivalencia de implementación interna.
 
-**Qué comparar:** no es un par visual; documenta una función defensiva propia de EduRoom.
+## 16.8 Comparativo responsivo de EduRoom
 
-**Similitudes:** no aplicable.
+Classroom se conserva como referencia manual observada en resolución original. La adaptación responsiva se acredita sobre EduRoom, producto propio capturable automáticamente en Render.
 
-**Diferencias deliberadas:** indicador académico agregado por el proyecto para exponer un resumen no sensible del checksum.
+| Flujo EduRoom | Escritorio 1280 × 720 | Tableta 768 × 1024 | Móvil 390 × 844 | Evaluación responsiva |
+|---|---|---|---|---|
+| Login | [Captura](../evidence/ui/eduroom/01-login--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/01-login--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/01-login--mobile-390x844.png) | Reflujo del panel y formulario legible |
+| Dashboard | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/02-dashboard-cursos--mobile-390x844.png) | Rejilla adaptable y acciones conservadas |
+| Tablón | [Captura](../evidence/ui/eduroom/03-curso-tablon--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/03-curso-tablon--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/03-curso-tablon--mobile-390x844.png) | Contexto y navegación se apilan |
+| Trabajo | [Captura](../evidence/ui/eduroom/04-trabajo-clase--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/04-trabajo-clase--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/04-trabajo-clase--mobile-390x844.png) | Actividades legibles en secuencia vertical |
+| Personas | [Captura](../evidence/ui/eduroom/05-personas--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/05-personas--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/05-personas--mobile-390x844.png) | Roles conservan jerarquía |
+| Detalle | [Captura](../evidence/ui/eduroom/06-detalle-tarea--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/06-detalle-tarea--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/06-detalle-tarea--mobile-390x844.png) | Paneles reordenados sin perder estado |
+| Entrega | [Captura](../evidence/ui/eduroom/07-entrega--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/07-entrega--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/07-entrega--mobile-390x844.png) | CTA y respuesta permanecen accesibles |
+| Calificación | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/08-calificacion-retroalimentacion--mobile-390x844.png) | Nota y feedback legibles |
+| Integridad | [Captura](../evidence/ui/eduroom/09-integridad--desktop-1280x720.png) | [Captura](../evidence/ui/eduroom/09-integridad--tablet-768x1024.png) | [Captura](../evidence/ui/eduroom/09-integridad--mobile-390x844.png) | Estado propio visible en tres tamaños |
 
-**Resultado académico:** **No aplicable** como correspondencia; evidencia propia satisfactoria.
+## 16.9 Resumen de calidad
 
-## 16.7 Resumen de calidad visual y UX
-
-| Dimensión | Evaluación provisional | Evidencia y observación |
+| Dimensión | Evaluación | Fundamento |
 |---|---|---|
-| Correspondencia de navegación | Alta | Dashboard → curso → tablón/trabajo/personas → tarea |
-| Correspondencia de jerarquía | Alta | Curso, actividad, estado y acciones mantienen prioridad reconocible |
-| Correspondencia de densidad visual | Media | El encabezado editorial de EduRoom ocupa más área sobre el pliegue en curso |
-| Correspondencia responsiva | Alta en EduRoom; par pendiente | Las muestras 1280×720, 768×1024 y 390×844 se reacomodan sin desbordamiento visible |
-| Diferencias intencionales | Alta diferenciación | Marca, copy, color, composición, iconos y componentes propios |
-| Profundidad funcional | Media | Se cubre el núcleo; faltan adjuntos reales, rúbricas, notificaciones y funciones institucionales |
+| Estructura y navegación | Alta | Dashboard, curso, tablón, actividades, personas y resultado conservan objetivos y jerarquía general |
+| Respuesta multiplataforma | Alta en EduRoom | Nueve flujos cuentan con evidencia 1280 × 720, 768 × 1024 y 390 × 844 |
+| Identidad y contenido | Independiente | EduRoom usa marca, paleta, componentes, textos y datos sintéticos propios |
+| Equivalencia estricta | No pretendida | Las resoluciones difieren y no se busca coincidencia pixel a pixel |
+| Limitaciones | Declaradas | Login e inicio tienen estados distintos; creación y trabajo usan capturas funcionales cercanas; Classroom solo acredita una resolución manual |
 
-Hallazgos de QA visual de EduRoom:
+### Resultado agregado
 
-- la identidad es consistente entre autenticación, dashboard y curso;
-- las acciones cambian de manera comprensible según profesor o estudiante;
-- el móvil conserva orden de lectura y controles utilizables;
-- el encabezado del curso desplaza parte del contenido en escritorio, una decisión estética que reduce densidad inmediata;
-- el panel de integridad es comprensible, aunque comparte captura con el dashboard y no constituye una pantalla autónoma;
-- deben ejecutarse pruebas adicionales con zoom 200 %, teclado, lector de pantalla y contraste antes de afirmar accesibilidad completa.
+| Resultado | Flujos |
+|---|---:|
+| Alta | 5 |
+| Media | 3 |
+| Baja | 1 |
+| No aplicable | 1 |
 
-## 16.8 Diferencias éticas y elementos no replicados
+## 16.10 Conclusión
 
-- logos, nombre de producto como marca de la réplica y recursos gráficos de Google;
-- iconografía propietaria, textos comerciales, paleta exacta y composición pixel a pixel;
-- tipografías o archivos remotos del objeto observado;
-- integraciones con servicios Google, videoconferencia y almacenamiento;
-- funciones institucionales, notificaciones, rúbricas y libro de calificaciones completo;
-- cualquier comportamiento interno no demostrable mediante interfaz pública.
+Las capturas respaldan una correspondencia funcional alta en los flujos principales de dashboard, tablón, detalle, entrega y personas, y una correspondencia media en creación, trabajo de clase y calificaciones. El inicio recibe valoración baja porque la referencia disponible muestra una sesión autenticada mientras EduRoom muestra el acceso público; esta limitación se documenta sin inventar una captura faltante.
 
-## 16.9 Checklist de capturas
+EduRoom alcanza correspondencia funcional suficiente como réplica académica de patrones generales de un LMS y demuestra adaptación responsiva propia. No es una copia visual exacta: conserva identidad, textos, recursos, composición detallada y decisiones de producto independientes.
 
-### Google Classroom — manual, autorizado y anonimizado
-
-- [ ] Login o pantalla inicial autorizada.
-- [ ] Lista de clases.
-- [ ] Tablón de una clase controlada.
-- [ ] Trabajo de clase.
-- [ ] Personas.
-- [ ] Detalle de tarea.
-- [ ] Entrega.
-- [ ] Calificación y retroalimentación.
-- [ ] Cada flujo en 1280×720, 768×1024 y 390×844 cuando sea razonablemente accesible.
-- [ ] Fecha, navegador, viewport y rol registrados.
-- [ ] SHA-256 calculado después de anonimizar.
-
-### EduRoom — Render
-
-- [x] Login o inicio, tres viewports.
-- [x] Dashboard de cursos, tres viewports.
-- [x] Curso/tablón, tres viewports.
-- [x] Trabajo de clase, tres viewports.
-- [x] Personas, tres viewports.
-- [x] Detalle de tarea, tres viewports.
-- [x] Entrega, tres viewports.
-- [x] Calificación y feedback, tres viewports.
-- [x] Estado de integridad, tres viewports.
-- [x] Manifiesto con origen, fecha y declaración de no automatización de Google Classroom.
-
-## 16.10 Advertencia de privacidad
-
-Antes de capturar Google Classroom, ocultar **nombres, correos, códigos de clase, fotografías, avatares, nombres de archivo, identificadores, notificaciones y cualquier dato personal**. Utilizar únicamente una cuenta controlada y contenido sintético. Revisar también barras del navegador, menús, paneles laterales y miniaturas.
-
-La anonimización debe realizarse sobre una copia. Los originales sensibles no deben entrar al repositorio. El desenfoque debe ser irreversible en el archivo entregado; no basta superponer una figura editable. Después de anonimizar, calcular SHA-256 y registrar la evidencia.
-
-## 16.11 Automatización y generación del inventario
-
-```bash
-npm run ui:capture
-npm run ui:report
-```
-
-`ui:capture` abre solo EduRoom, crea contenido sintético y guarda 27 PNG en `evidence/ui/eduroom/`. Usa Chrome mediante Playwright y admite `EDUROOM_BASE_URL` y `EDUROOM_BROWSER_CHANNEL`. No debe ejecutarse repetidamente porque la API no ofrece limpieza de los datos QA.
-
-`ui:report` compara nombres de archivo esperados y genera `evidence/ui/ui-comparison-inventory.md`. Nunca descarga ni abre Google Classroom: las referencias deben ser aportadas manualmente en `evidence/ui/google-classroom/`.
-
-## 16.12 Conclusión
-
-EduRoom preserva patrones funcionales generales de una plataforma LMS: colección de cursos, contexto persistente, navegación por tablón/trabajo/personas, tareas, entrega, evaluación y feedback. La correspondencia se concentra en objetivos y estructura, mientras que la identidad visual permanece independiente mediante marca, textos, componentes y decisiones gráficas propias.
-
-La evidencia de EduRoom está completa para los tres viewports. La calificación comparativa definitiva de cada par debe cerrarse únicamente cuando el alumno aporte capturas manuales, propias, autorizadas y anonimizadas de la referencia observada.
+Versión preparada para impresión: [26. Comparativo UI para impresión](26-comparativo-ui-print.md).

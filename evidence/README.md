@@ -20,6 +20,8 @@ evidence/
 ├── render/                  Deploy, variables ocultas y disponibilidad
 ├── github/                  Repositorio, commit o etiqueta de entrega
 ├── database/                Esquema y datos sintéticos cifrados
+├── performance/
+│   └── eduroom/             Métricas ligeras y capturas del cliente público
 └── presentation/            Evidencia seleccionada para exposición y PDF
 ```
 
@@ -142,6 +144,7 @@ El hash debe calcularse después de anonimizar la imagen. Si la evidencia cambia
 - `ui/eduroom/capture-manifest.json` registra 27 capturas automatizadas de nueve flujos en tres viewports.
 - La carpeta también conserva nombres legados usados por el comparativo visual; no deben contarse como ejecuciones adicionales sin revisar el manifest.
 - `ui/google-classroom/README.md` contiene el protocolo para capturas manuales; actualmente no acredita que ya existan capturas de Classroom.
+- `performance/eduroom/` conserva una medición puntual reproducible del cliente público; no representa memoria del servidor ni un benchmark.
 - Las carpetas API, seguridad, Render, GitHub, base de datos y presentación se crean como contenedores de entrega. Su existencia no equivale a evidencia completada.
 
 ## Exclusiones

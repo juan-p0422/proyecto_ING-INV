@@ -13,8 +13,8 @@ services:
     # NODE_ENV=production is available during Render builds. Explicitly include
     # devDependencies because TypeScript, Vite and the @types packages are
     # build-time tools even though they are not needed by the running app.
-    buildCommand: npm ci --include=dev --prefix backend && npm ci --include=dev --prefix frontend && npm run build
-    startCommand: npm --prefix backend run start:prod
+    buildCommand: npm run render:build
+    startCommand: npm run render:start
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
@@ -34,4 +34,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: STRICT_INTEGRITY
-        value: "false"
+        value: "true"

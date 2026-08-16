@@ -73,18 +73,24 @@ function safeResolve(root: string, relativePath: string): string {
   return resolved;
 }
 
-async function collectJavaScript(directory: string): Promise<string[]> {
+async function collectFiles(directory: string, extensions: string[]): Promise<string[]> {
   if (!await exists(directory)) return [];
   const result: string[] = [];
   for (const entry of await fs.readdir(directory, { withFileTypes: true })) {
     const absolute = path.join(directory, entry.name);
-    if (entry.isDirectory()) result.push(...await collectJavaScript(absolute));
-    else if (entry.isFile() && entry.name.endsWith('.js') && !/\.(tmp|temp)\.js$/i.test(entry.name)) result.push(absolute);
+    if (entry.isDirectory()) result.push(...await collectFiles(absolute, extensions));
+    else if (entry.isFile() && extensions.includes(path.extname(entry.name).toLowerCase()) && !/\.(tmp|temp)(\.[^.]+)?$/i.test(entry.name)) result.push(absolute);
   }
   return result;
 }
 
-export async function verifyBackendIntegrity(options: { strict: boolean; manifestPath?: string }): Promise<IntegrityReport> {
+function belongsToScope(entryPath: string, scope: ManifestScope): boolean {
+  const normalizedRoot = scope.root.replace(/\\/g, '/').replace(/\/$/, '');
+  return entryPath.startsWith(`${normalizedRoot}/`)
+    && scope.extensions.includes(path.posix.extname(entryPath).toLowerCase());
+}
+
+export async function verifyRuntimeIntegrity(options: { strict: boolean; manifestPath?: string }): Promise<IntegrityReport> {
   const checkedAt = new Date().toISOString();
   const locatedManifest = await locateManifest(options.manifestPath);
   if (!locatedManifest) {
@@ -99,7 +105,9 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
   try {
     const manifestRoot = path.dirname(locatedManifest);
     const manifest = validateManifest(JSON.parse(await fs.readFile(locatedManifest, 'utf8')));
-    const expectedEntries = manifest.files.filter((entry) => entry.path.startsWith('backend/dist/') && entry.path.endsWith('.js'));
+    const expectedEntries = manifest.files.filter((entry) =>
+      manifest.scopes.some((scope) => belongsToScope(entry.path, scope)),
+    );
     const expectedPaths = new Set(expectedEntries.map((entry) => entry.path));
     const modifiedFiles: string[] = [];
     const missingFiles: string[] = [];
@@ -112,8 +120,9 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
       if (await calculateFileSha256(absolute) !== entry.sha256) modifiedFiles.push(entry.path);
     }
 
-    const backendScope = manifest.scopes.find((scope) => scope.root === 'backend/dist');
-    const currentFiles = backendScope ? await collectJavaScript(safeResolve(manifestRoot, backendScope.root)) : [];
+    const currentFiles = (await Promise.all(manifest.scopes.map((scope) =>
+      collectFiles(safeResolve(manifestRoot, scope.root), scope.extensions),
+    ))).flat();
     const newFiles = currentFiles
       .map((absolute) => path.relative(manifestRoot, absolute).split(path.sep).join('/'))
       .filter((relative) => !expectedPaths.has(relative));
@@ -130,9 +139,9 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
       manifestFound: true,
     };
 
-    if (latestReport.status === 'verified') console.info(`[integrity] ${filesChecked} archivos del backend verificados.`);
-    else if (expectedEntries.length === 0) console.warn('[integrity] El manifiesto no contiene artefactos verificables del backend.');
-    else console.warn(`[integrity] Advertencia: ${modifiedFilesCount} discrepancias en artefactos del backend.`);
+    if (latestReport.status === 'verified') console.info(`[integrity] ${filesChecked} artefactos de runtime verificados.`);
+    else if (expectedEntries.length === 0) console.warn('[integrity] El manifiesto no contiene artefactos verificables de runtime.');
+    else console.warn(`[integrity] Advertencia: ${modifiedFilesCount} discrepancias en artefactos de runtime.`);
   } catch (error) {
     latestReport = { ...latestReport, status: 'warning', checkedAt, manifestFound: true, modifiedFilesCount: Math.max(1, latestReport.modifiedFilesCount) };
     console.warn(`[integrity] No fue posible completar la verificación: ${error instanceof Error ? error.message : 'error desconocido'}`);
@@ -143,6 +152,9 @@ export async function verifyBackendIntegrity(options: { strict: boolean; manifes
   }
   return latestReport;
 }
+
+// Alias conservado para consumidores anteriores. La verificación ya no se limita al backend.
+export const verifyBackendIntegrity = verifyRuntimeIntegrity;
 
 export function getPublicIntegrityStatus() {
   const { status, checkedAt, filesChecked, modifiedFilesCount } = latestReport;

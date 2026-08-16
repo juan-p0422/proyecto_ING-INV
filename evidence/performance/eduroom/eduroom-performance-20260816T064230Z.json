@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "measuredAt": "2026-08-16T06:42:33.184Z",
+  "target": "https://eduroom-znb0.onrender.com",
+  "scope": "Página pública, una navegación, sin autenticación",
+  "browser": {
+    "engine": "Chromium",
+    "version": "151.0.7922.138",
+    "launchMode": "chrome",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "response": {
+    "status": 200,
+    "ok": true
+  },
+  "metrics": {
+    "loadTimeMs": 481.6,
+    "domContentLoadedMs": 481.3,
+    "responseStartMs": 264.7,
+    "wallClockNavigationAndSettlingMs": 1990.17,
+    "approximateResourceCount": 5,
+    "resourceEntriesExcludingDocument": 4,
+    "approximateTransferredBytes": 93361,
+    "approximateEncodedBodyBytes": 92115,
+    "jsHeapUsedBytes": 2185404,
+    "jsHeapTotalBytes": 3407872,
+    "domElementCount": 42,
+    "cdpNodeCount": 88,
+    "cdpDocumentCount": 2,
+    "resourcesByInitiatorType": {
+      "script": 1,
+      "link": 1,
+      "other": 2
+    }
+  },
+  "artifacts": {
+    "screenshot": "evidence/performance/eduroom/eduroom-performance-20260816T064230Z.png",
+    "json": "evidence/performance/eduroom/eduroom-performance-20260816T064230Z.json"
+  },
+  "limitations": [
+    "Medición puntual del cliente; no representa memoria ni rendimiento de los servidores de Render.",
+    "Los tamaños transferidos pueden ser cero o parciales por caché, políticas del navegador o ausencia de Timing-Allow-Origin.",
+    "El heap JavaScript es una aproximación específica de Chromium y puede variar entre ejecuciones.",
+    "La espera adicional de 1500 ms permite estabilización visual y solo aparece en wallClockNavigationAndSettlingMs.",
+    "No se realizó carga masiva, autenticación, interacción de usuario ni automatización de Google Classroom."
+  ]
+}

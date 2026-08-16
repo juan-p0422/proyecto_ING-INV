@@ -1,8 +1,8 @@
 ---
 title: "EduRoom: reporte final integrado"
 subtitle: "Ingeniería inversa ética de Google Classroom y réplica académica independiente"
-author: "Juan Pantoja"
-date: "Agosto de 2026"
+author: "Juan Oswaldo Emilio Olivares Pantoja"
+date: "16 de agosto de 2026"
 lang: es-MX
 geometry: margin=2.2cm
 toc: true
@@ -19,9 +19,14 @@ numbersections: false
 **Producto académico independiente:** EduRoom  
 **Tipo de análisis:** caja negra, OSINT y análisis dinámico no invasivo  
 **Asignatura:** Ingeniería inversa  
-**Tipo de entrega:** examen práctico  
-**Autor:** Juan Pantoja  
-**Fecha:** agosto de 2026
+**Tipo de entrega:** reporte de práctica
+
+**Autor:** Juan Oswaldo Emilio Olivares Pantoja
+
+**Número de registro:** 23110022
+
+**Grupo:** 8C
+**Fecha:** 16 de agosto de 2026
 
 [Repositorio del proyecto](https://github.com/juan-p0422/proyecto_ING-INV)  
 [Aplicación desplegada en Render](https://eduroom-znb0.onrender.com)
@@ -38,7 +43,7 @@ Este reporte documenta un ejercicio académico de ingeniería inversa ética apl
 
 El conocimiento funcional se transformó en EduRoom, una aplicación web independiente con roles de profesor y estudiante, cursos, anuncios, tareas, entregas, comentarios, calificaciones y retroalimentación. La réplica se implementó con React, Express, TypeScript, Prisma y PostgreSQL; se desplegó en Render y se protegió con autenticación JWT, bcrypt, validación Zod, autorización en servidor, AES-256-GCM para notas seleccionadas, ofuscación del frontend, checksum SHA-256 y diagnóstico antidebug no destructivo.
 
-La validación documentada comprende 11 pruebas automatizadas locales, 26 solicitudes API aprobadas contra Render, 14 controles defensivos aprobados y 27 capturas Playwright de EduRoom. El análisis también registra limitaciones y riesgos: autoasignación pública del rol docente, JWT en `localStorage`, falta de revocación, manifiesto no firmado, integridad no estricta en Render y un desbordamiento de 32 px en el login de tableta.
+La validación documentada comprende 12 pruebas automatizadas locales, 26 solicitudes API aprobadas contra Render, 14 controles defensivos aprobados y 27 capturas Playwright de EduRoom. El análisis también registra limitaciones y riesgos: autoasignación pública del rol docente, JWT en `localStorage`, falta de revocación, manifiesto no firmado, despliegue público observado con integridad no bloqueante y un desbordamiento de 32 px en el login de tableta. El repositorio contiene un candidato estricto de 22 artefactos, cuya atribución a producción requiere redespliegue correlacionado.
 
 ---
 
@@ -55,7 +60,9 @@ La validación documentada comprende 11 pruebas automatizadas locales, 26 solici
 | Documento rector | `docs/17-reporte-final-integrado.md` |
 | Evidencias | `evidence/ui/eduroom/` y checklist en `docs/13-evidencias.md` |
 
-**[INSERTAR CAPTURA: portada académica o captura anonimizada del dashboard de EduRoom]**
+![Dashboard de EduRoom usado como imagen de portada; demuestra la réplica desplegada y corresponde a evidencia propia](../evidence/ui/eduroom/02-dashboard-cursos--desktop-1280x720.png)
+
+**Versión definitiva para PDF:** [31. Reporte final listo para PDF](31-reporte-final-pdf-ready.md), con portada formal, índice, lista de figuras y anexo completo de evidencias existentes.
 
 ---
 
@@ -88,7 +95,7 @@ Desarrollar y demostrar un procedimiento académico completo de ingeniería inve
 - Identificar tecnologías, entradas, salidas, estados y uso general de memoria desde el navegador.
 - Construir una réplica fiable de los flujos académicos esenciales sin copiar código o identidad visual.
 - Validar el producto mediante pruebas locales, API, defensivas, visuales y de integridad.
-- Preparar una demostración presencial reproducible con evidencias anonimizadas.
+- Preparar una demostración presencial reproducible con evidencias propias/controladas y sin secretos reutilizables.
 
 ### 3.3 Correspondencia con la consigna
 
@@ -130,12 +137,14 @@ El método se diseñó como caja negra: se estudian entradas, salidas, estados y
 
 ### 4.4 Protección de datos personales
 
+> Las capturas de Google Classroom y otras plataformas corresponden a cuentas personales/controladas por el alumno. El alumno autorizó su inclusión sin anonimización adicional. Se usan exclusivamente como evidencia académica de flujos, pruebas y despliegue.
+
 - se usan cuentas y contenido sintéticos;
 - correos de automatización pertenecen al dominio reservado `example.com`;
 - tokens, contraseñas, códigos e identificadores no se imprimen en reportes;
-- capturas de Google Classroom deben anonimizar nombres, correos, fotos, códigos y archivos;
-- los originales sensibles no deben incorporarse al repositorio;
-- la evidencia final anonimizada debe recibir un checksum SHA-256.
+- las capturas existentes de Google Classroom pertenecen a cuentas personales/controladas y el alumno autorizó expresamente su inclusión sin anonimización adicional;
+- otros originales sensibles no autorizados no deben incorporarse al repositorio;
+- la evidencia final debe recibir un checksum SHA-256; Classroom conserva sus originales autorizados y las demás categorías siguen su política de anonimización.
 
 > **Criterio de detención:** si una prueba requiere datos ajenos, evasión de controles, carga agresiva o una acción no autorizada, no se ejecuta.
 
@@ -218,9 +227,10 @@ Docente: acceso -> clase -> publicación/tarea -> revisión -> calificación
 Estudiante: acceso -> clase -> tarea -> entrega -> resultado
 ```
 
-**[INSERTAR CAPTURA: lista de clases autorizada y anonimizada]**  
-**[INSERTAR CAPTURA: tablón con contenido sintético]**  
-**[INSERTAR CAPTURA: tarea y entrega sin datos personales]**
+![Inicio/dashboard manual autorizado de Classroom](../evidence/ui/google-classroom/GC-01-login-o-inicio.png)
+![Tablón manual de Classroom; referencia observada que demuestra contexto y navegación](../evidence/ui/google-classroom/GC-04-tablon.png)
+
+![Entrega manual de Classroom; referencia observada que demuestra el flujo y estado de envío](../evidence/ui/google-classroom/GC-07-entrega-tarea.png)
 
 ### 6.5 Tecnologías inferidas
 
@@ -262,7 +272,7 @@ El análisis detallado está en [02-analisis-google-classroom.md](02-analisis-go
 | Herramienta | Función | Uso o estado en el proyecto |
 |---|---|---|
 | Navegador | Ejecutar y observar interfaces web | Usado en observación autorizada y QA de EduRoom |
-| DevTools | Network, Application, Performance, Memory y accesibilidad | Protocolo documentado; evidencias sensibles deben censurarse |
+| DevTools | Network, Application, Performance, Memory y accesibilidad | Protocolo documentado; los originales autorizados se conservan y cualquier secreto reutilizable obliga a revisión |
 | Lighthouse | Rendimiento, accesibilidad y buenas prácticas | Herramienta propuesta para línea base propia; no se atribuyen métricas no registradas |
 | Wappalyzer o similar | Inferencia tecnológica por señales públicas | Uso conceptual; cualquier resultado sobre terceros es probabilístico |
 | OWASP ZAP pasivo | Observar alertas sobre tráfico autorizado | Solo modo pasivo/local si se ejecuta; no se usó escaneo activo contra terceros |
@@ -291,7 +301,7 @@ Las configuraciones y limitaciones están en [03-herramientas-utilizadas.md](03-
 |---|---|---|
 | 1. Reconocimiento público | Consultar fuentes oficiales y delimitar alcance | Contexto y bibliografía |
 | 2. Observación funcional | Recorrer acciones legítimas con datos sintéticos | Inventario de pantallas, roles y estados |
-| 3. Análisis dinámico | Network, Application, Performance y Memory | Bitácoras y capturas anonimizadas |
+| 3. Análisis dinámico | Network, Application, Performance y Memory | Bitácoras y capturas manuales autorizadas |
 | 4. Reconstrucción | Inferir entidades, relaciones y reglas | Modelo conceptual |
 | 5. Diseño | Elegir arquitectura, identidad y límites | Especificación de EduRoom |
 | 6. Implementación | Construir API, SPA y persistencia | Aplicación funcional |
@@ -319,31 +329,31 @@ En cada fase se separan tres clases de afirmación:
 5. Registrar únicamente método, tipo, estado, tiempo, tamaño y efecto visible.
 6. Sanitizar identificadores, cuerpos, cookies, tokens y rutas privadas.
 7. Repetir solo si se necesita confirmar un patrón.
-8. Calcular SHA-256 de la evidencia anonimizada.
+8. Calcular SHA-256 de la evidencia final; para las capturas de Classroom se conserva el original autorizado sin anonimización adicional.
 
 ### 9.2 Network
 
 Se correlacionan acciones con solicitudes Fetch/XHR, documentos y recursos. Se observan códigos HTTP y tiempos generales sin inferir endpoints internos no demostrados ni conservar headers sensibles.
 
-**[INSERTAR CAPTURA: Network censurado con columnas de tipo, estado, tiempo y tamaño]**
+![Network manual autorizado con columnas de tipo, estado, tiempo y tamaño](../evidence/dynamic/google-classroom/GC-DYN-01-network-xhr.png)
 
 ### 9.3 Application
 
 Se inventarían cookies, Local Storage, Session Storage, Cache Storage y service workers por categoría. Los valores se ocultan. En EduRoom se confirmó que el JWT se guarda en `localStorage`, decisión que se registra como riesgo frente a XSS.
 
-**[INSERTAR CAPTURA: categorías de almacenamiento sin valores]**
+> **Evidencia disponible en resguardo:** `GC-DYN-03-application-storage.png` demuestra categorías observables de Application Storage, pero no se incrusta en una nueva exportación mientras las cookies visibles puedan ser reutilizables.
 
 ### 9.4 Performance
 
 Se registra una navegación representativa para observar tareas largas, scripting, layout y pintura. Las cifras dependen del equipo y red; deben acompañarse de contexto y no generalizarse a la infraestructura del proveedor.
 
-**[INSERTAR CAPTURA: traza Performance con datos personales ausentes]**
+Para Classroom existe una captura manual autorizada. La sesión visible del 16-08-2026 registra en Network `DOMContentLoaded=455 ms`, `Load=2.19 s`, finalización 6.96 s, 64 solicitudes, 1,060 kB transferidos y 4,262 kB de recursos; la traza de Performance cubre 20.62 s y muestra INP 58 ms y CLS 0. Para EduRoom existe una medición reproducible de la página pública: `load=481.60 ms`, `DOMContentLoaded=481.30 ms`, cinco recursos aproximados y 93,361 bytes transferidos en la muestra del `2026-08-16T06:42:33.184Z`. Son muestras de flujos distintos y no se usan para afirmar superioridad.
 
 ### 9.5 Memory
 
 Se comparan snapshots antes y después de repetir un flujo. Una subida temporal puede deberse a caché o recolección diferida. Solo la retención sostenida de objetos ya inaccesibles justificaría una hipótesis de fuga.
 
-**[INSERTAR CAPTURA: resumen de heap sin contenido sensible]**
+Para Classroom, el resumen manual de heap muestra 24,473 kB retenidos en `(compiled code)`, 15,261 kB en `Function` y 12,256 kB en `(string)`; no se estima el total porque la etiqueta de DevTools está truncada y no se publica `.heapsnapshot`. Para EduRoom, Chromium/CDP informó 2,185,404 bytes de heap JavaScript usado y 3,407,872 bytes totales en la misma ejecución puntual. El protocolo, transcripción, JSON y capturas están en [25. Medición de Performance y Memory](25-medicion-performance-memory.md).
 
 ### 9.6 Evidencias sugeridas
 
@@ -376,7 +386,7 @@ OWASP Top 10:2021 se aplicó al código y despliegue propios. Google Classroom n
 | V-03 | Sin revocación o refresh rotatorio | Media | JWT autocontenido por 8 h | Ciclo corto y revocable | Abierto |
 | V-04 | Código de curso no expira | Media | `/api/courses/join` | Rotación, expiración y aprobación | Abierto |
 | V-05 | Manifiesto SHA-256 no firmado | Media | `integrity-manifest.json` | Firma o attestation del pipeline | Parcial |
-| V-06 | `STRICT_INTEGRITY=false` en Render | Media | `render.yaml` | Activar tras validar pipeline y recuperación | Abierto |
+| V-06 | Deploy público observado con integridad no bloqueante; candidato local estricto aún no acreditado en producción | Media | endpoint productivo, `render.yaml` y documento 28 | Redesplegar el mismo commit y conservar logs/contadores | Parcial operativo |
 | V-07 | Clave AES única sin rotación | Media | `APP_ENCRYPTION_KEY` | KMS, identificador y recifrado | Abierto |
 | V-08 | Sin auditoría estructurada | Media | ausencia de eventos persistentes | Logs sanitizados y alertas | Abierto |
 | V-09 | Dependencias futuras vulnerables | Variable | ecosistema npm | Auditoría y actualización continua | Mitigado actualmente |
@@ -661,11 +671,15 @@ npm run integrity:generate
 npm run integrity:verify
 ```
 
-El manifiesto registra ruta, hash y tamaño de artefactos. El backend verifica JavaScript de `backend/dist` antes de abrir el puerto y clasifica archivos modificados, ausentes o nuevos. Con `STRICT_INTEGRITY=true` bloquea discrepancias; Render está configurado actualmente en `false`.
+El manifiesto registra scope, ruta, hash y tamaño de artefactos. El servidor candidato verifica los JavaScript de `backend/dist` y `frontend/dist` antes de abrir el puerto, y clasifica archivos modificados, ausentes o nuevos. Con `STRICT_INTEGRITY=true` bloquea discrepancias. La última observación pública verificable correspondió al despliegue anterior no bloqueante de 19 archivos; el repositorio configura el candidato estricto de 22 artefactos, cuya atribución a la URL pública exige redespliegue y evidencia correlacionada. Véase [28. Validación de integridad estricta](28-validacion-strict-integrity.md).
 
 ### 14.9 Antireversing educativo
 
 El diagnóstico identifica variables de instrumentación y ambiente de producción, emite advertencias y no termina procesos ni modifica el sistema. La combinación de autorización en servidor, ofuscación, checksum y separación de secretos constituye defensa en profundidad limitada.
+
+### 14.10 Observabilidad del cliente web
+
+El navegador debe descargar HTML, CSS y JavaScript para presentar y ejecutar la interfaz. Por ello DevTools puede inspeccionar el DOM, los estilos, los bundles y las solicitudes de la sesión. Esta propiedad no se trata como un incumplimiento: EduRoom presupone un cliente observable y potencialmente modificable, y conserva autenticación, autorización, validación y secretos en el servidor. La ofuscación dificulta lectura casual, pero no vuelve invisible el frontend ni impide por completo la ingeniería inversa. Véase [29. Limitaciones de protección del cliente web](29-limitaciones-proteccion-cliente-web.md).
 
 Véanse [07-seguridad-antireversing.md](07-seguridad-antireversing.md), [08-checksum.md](08-checksum.md) y [09-cifrado-ofuscacion.md](09-cifrado-ofuscacion.md).
 
@@ -677,7 +691,7 @@ Véanse [07-seguridad-antireversing.md](07-seguridad-antireversing.md), [08-chec
 
 | Suite | Fecha | Alcance | Resultado |
 |---|---|---|---|
-| Vitest backend | 14-08-2026 | checksum, cifrado y SPA producción | 9 aprobadas, 0 fallidas |
+| Vitest backend | 16-08-2026 | checksum, cifrado, SPA e integridad | 10 aprobadas, 0 fallidas |
 | Vitest frontend | 14-08-2026 | cliente API | 2 aprobadas, 0 fallidas |
 | API Render | 14-08-2026 | todos los 21 endpoints; 26 solicitudes | 26 aprobadas, 0 fallidas |
 | Seguridad Render | 14-08-2026 | 14 controles defensivos | 14 aprobados, 0 fallidos |
@@ -716,7 +730,7 @@ Detalles: [pruebas API](14-pruebas-api-render.md), [seguridad](15-analisis-vulne
 
 ## 16. Comparativo visual
 
-La comparación evalúa correspondencia funcional y estructural, no identidad estética. No pretende equivalencia pixel a pixel. EduRoom mantiene nombre, marca, paleta, copy, componentes e iconografía propios.
+La comparación evalúa correspondencia funcional y estructural, no identidad estética ni equivalencia pixel a pixel. EduRoom mantiene nombre, marca, paleta, copy, componentes e iconografía propios. Se aceptan nueve capturas UI y seis capturas dinámicas de Classroom en su resolución manual original, conforme a la autorización expresa del alumno. La diferencia de resolución no invalida su función como referencia observada.
 
 | Flujo | Correspondencia funcional | Diferencia deliberada |
 |---|---|---|
@@ -730,11 +744,11 @@ La comparación evalúa correspondencia funcional y estructural, no identidad es
 | Integridad | Función propia de EduRoom | Sin equivalente requerido |
 
 Documento completo: [Comparativo visual de interfaces](16-comparativo-ui.md).  
-Versión imprimible: [Comparativo listo para PDF](pdf/comparativo-ui-print.md).
+Versión imprimible: [Comparativo UI para impresión](26-comparativo-ui-print.md).
 
-![Dashboard móvil de EduRoom](../evidence/ui/eduroom/dashboard-390x844.png)
-
-**[INSERTAR CAPTURA: par manual anonimizado Google Classroom/EduRoom]**
+| Classroom: dashboard manual autorizado | EduRoom: dashboard móvil |
+|---|---|
+| ![Dashboard manual de Classroom](../evidence/ui/google-classroom/GC-02-dashboard-clase.png) | ![Dashboard móvil de EduRoom](../evidence/ui/eduroom/02-dashboard-cursos--mobile-390x844.png) |
 
 ---
 
@@ -742,24 +756,32 @@ Versión imprimible: [Comparativo listo para PDF](pdf/comparativo-ui-print.md).
 
 | ID | Evidencia esperada | Ruta o estado |
 |---|---|---|
-| EV-17-01 | Estructura y commit del repositorio | `[INSERTAR CAPTURA]` |
-| EV-17-02 | Observación externa autorizada | `[INSERTAR CAPTURA ANONIMIZADA]` |
-| EV-17-03 | Network censurado | `[INSERTAR CAPTURA]` |
+| EV-17-01 | Estructura y commit del repositorio | **[PENDIENTE DE CAPTURA MANUAL]** `GH-01..03` |
+| EV-17-02 | Observación externa autorizada | `evidence/ui/google-classroom/GC-01..09` y `evidence/dynamic/google-classroom/GC-DYN-01..06` |
+| EV-17-03 | Network manual autorizado | `evidence/dynamic/google-classroom/GC-DYN-01-network-xhr.png` |
 | EV-17-04 | Modelo Prisma/relaciones | `backend/prisma/schema.prisma` |
 | EV-17-05 | Login/dashboard EduRoom | `evidence/ui/eduroom/` |
 | EV-17-06 | Curso, tablón y trabajo | `evidence/ui/eduroom/` |
 | EV-17-07 | Personas | `evidence/ui/eduroom/people-1280x720.png` |
 | EV-17-08 | Entrega y calificación | `evidence/ui/eduroom/assignment-*.png` |
 | EV-17-09 | Integridad verificada | `/api/security/integrity` y captura de dashboard |
-| EV-17-10 | Integridad alterada local | `[INSERTAR CAPTURA DE CAMBIO CONTROLADO]` |
-| EV-17-11 | Nota cifrada y recuperación | `[INSERTAR CAPTURA SIN CLAVE/CIPHERTEXT COMPLETO]` |
-| EV-17-12 | Build ofuscado | `[INSERTAR CAPTURA COMPARATIVA]` |
+| EV-17-10 | Integridad alterada local | Demostración reproducible en `tests/integrity-demo.js`; PNG **[PENDIENTE DE CAPTURA MANUAL]** |
+| EV-17-11 | Nota cifrada y recuperación | Implementación y prueba documentadas; PNG sin clave **[PENDIENTE DE CAPTURA MANUAL]** |
+| EV-17-12 | Build ofuscado | `evidence/security/SEC-07-obfuscated-build-proof.txt`; PNG opcional pendiente |
 | EV-17-13 | Smoke test API | salida sanitizada 26/26 |
 | EV-17-14 | Seguridad defensiva | salida sanitizada 14/14 |
 | EV-17-15 | Capturas UI | 27 PNG y `capture-manifest.json` |
 | EV-17-16 | Deploy | [https://eduroom-znb0.onrender.com](https://eduroom-znb0.onrender.com) |
 
-Cada evidencia debe registrar fecha, zona, herramienta, versión, rol, precondición, acción, resultado, clasificación, censura y SHA-256. El checklist completo está en [13-evidencias.md](13-evidencias.md).
+Cada evidencia debe registrar fecha, zona, herramienta, versión, rol, precondición, acción, resultado, clasificación, autorización aplicable, revisión de secretos y SHA-256. El checklist completo está en [13-evidencias.md](13-evidencias.md).
+
+### 17.1 Evidencias técnicas finales
+
+El inventario físico final se documenta en [27. Evidencias técnicas finales](27-evidencias-tecnicas-finales.md). La revisión detectó nueve capturas UI y seis de DevTools de Google Classroom, además de 54 PNG de EduRoom. Las referencias de Classroom proceden de cuentas personales/controladas y están autorizadas sin anonimización adicional; los nombres, avatares, URL, identificadores, códigos propios y su resolución original no invalidan la evidencia.
+
+Las carpetas `evidence/api/`, `evidence/render/`, `evidence/database/` y `evidence/github/` solo contienen `.gitkeep`. Seguridad incorpora SEC-07 como documentación equivalente del build ofuscado. Por tanto, quedan 25 capturas técnicas pendientes. No se atribuye esta parcialidad a falta de censura o a diferencias de resolución, sino a la ausencia real de los archivos.
+
+La autorización de datos propios no alcanza contraseñas, JWT completos, cookies de sesión, tokens privados, claves, valores completos de variables ni cadenas de conexión. Si una futura captura contiene uno de estos secretos reutilizables, debe marcarse **Requiere revisión**, conservarse sin borrado automático y excluirse de la presentación hasta disponer de una copia segura.
 
 ---
 
@@ -769,7 +791,7 @@ Cada evidencia debe registrar fecha, zona, herramienta, versión, rol, precondic
 
 - se documentó una metodología ética para una aplicación no open source;
 - se identificaron roles, flujos, entradas, salidas, estados y estructuras conceptuales;
-- se preparó un procedimiento reproducible de análisis dinámico y memoria;
+- se preparó un procedimiento manual seguro para Classroom y se obtuvo una medición reproducible de Performance/Memory del cliente público de EduRoom;
 - se implementó EduRoom con los flujos esenciales solicitados;
 - se incorporaron cifrado, ofuscación, checksum y antireversing educativo;
 - se desplegó la aplicación con PostgreSQL y migraciones;
@@ -785,11 +807,11 @@ Cada evidencia debe registrar fecha, zona, herramienta, versión, rol, precondic
 | Estructuras de datos | Cumplido | Prisma y capítulo 05 |
 | Tecnologías | Cumplido con distinción inferencia/hecho | capítulos 02, 03 y 13 |
 | Entradas y salidas | Cumplido | capítulos 02 y 06 de este reporte |
-| Uso de memoria | Procedimiento completo; evidencia manual pendiente | capítulo 09 |
+| Uso de memoria | Cumple documentalmente: EduRoom medido y Classroom observado manualmente con valores visibles transcritos | capítulos 09 y [25](25-medicion-performance-memory.md) |
 | Réplica funcional | Cumplido | EduRoom y pruebas API |
 | Roles/cursos/tareas/entregas/comentarios/notas | Cumplido | API, UI y esquema |
 | Cifrado/ofuscación | Cumplido | AES-GCM y build ofuscado |
-| Checksum previo a ejecución | Cumplido | manifest y verificación backend |
+| Checksum previo a ejecución | Candidato corregido; despliegue final pendiente | manifest y verificación de scopes backend/frontend |
 | Vulnerabilidades | Cumplido defensivamente | capítulo 15 |
 | Presentación | Preparada | guion y evidencias |
 
@@ -813,10 +835,11 @@ Este resultado prueba disponibilidad e integridad en ese instante; no es una gar
 - No se accedió al código, esquema, infraestructura o datos propietarios de Google.
 - Las tecnologías internas atribuidas a Google no se confirman; se mantienen como inferencias limitadas.
 - No se realizó pentest ni evaluación de seguridad de Google Classroom.
-- El protocolo de memoria requiere capturas manuales finales para la presentación.
+- `GC-DYN-03-application-storage.png` contiene valores visibles de cookies de sesión y se clasifica **Requiere revisión**. Aunque la cuenta sea personal/controlada, la figura no debe entregarse ni proyectarse mientras esos valores puedan ser reutilizables; el original se conserva sin modificación.
+- Las mediciones de EduRoom y Classroom son muestras puntuales del cliente; no miden servidores, no son benchmarks comparables y no demuestran por sí solas una fuga de memoria.
 - SHA-256 detecta cambios respecto de un manifiesto confiable, pero el manifiesto no está firmado.
-- En web, el cliente recibe código ejecutable; la ofuscación puede revertirse con esfuerzo.
-- Render usa `STRICT_INTEGRITY=false`, por lo que una discrepancia no bloquearía el arranque.
+- En web, el cliente recibe código ejecutable y puede inspeccionarlo con DevTools. Es una limitación inherente y documentada, no una ausencia de control: la seguridad depende de las decisiones del servidor; la ofuscación solo eleva el esfuerzo de análisis.
+- El deploy observado todavía correspondía al alcance anterior; la configuración candidata usa `STRICT_INTEGRITY=true`, pero requiere redespliegue y evidencia antes de atribuirla a producción.
 - El plan gratuito puede dormir servicios, introducir cold starts y limitar recursos/disponibilidad.
 - El JWT se guarda en `localStorage` y no existe revocación o renovación.
 - El registro público permite solicitar rol docente y debe corregirse antes de uso real.
@@ -883,7 +906,17 @@ En conclusión, EduRoom cumple la consigna central: reconstruye de manera fiable
 - [15 - Análisis de vulnerabilidades](15-analisis-vulnerabilidades.md)
 - [16 - Comparativo UI](16-comparativo-ui.md)
 - [18 - Capturas de EduRoom](18-capturas-eduroom-render.md)
-- [Versión imprimible del comparativo UI](pdf/comparativo-ui-print.md)
+- [21 - Matriz de cumplimiento](21-matriz-cumplimiento-rubrica.md)
+- [22 - Validación final de Render](22-validacion-final-render.md)
+- [23 - Cierre de brechas](23-cierre-brechas-finales.md)
+- [24 - Guía de capturas manuales de Classroom](24-guia-capturas-classroom.md)
+- [25 - Medición de Performance y Memory](25-medicion-performance-memory.md)
+- [Versión imprimible del comparativo UI](26-comparativo-ui-print.md)
+- [27 - Evidencias técnicas finales](27-evidencias-tecnicas-finales.md)
+- [28 - Validación de integridad estricta](28-validacion-strict-integrity.md)
+- [29 - Limitaciones de protección del cliente web](29-limitaciones-proteccion-cliente-web.md)
+- [30 - Presentación final imprimible](30-presentacion-final-print.md)
+- [31 - Reporte final listo para PDF](31-reporte-final-pdf-ready.md)
 
 ---
 

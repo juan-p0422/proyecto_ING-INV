@@ -49,7 +49,7 @@ No son el mismo manifiesto:
 | `docs/checksums.sha256` | `scripts/checksum.ps1` o `scripts/checksum.sh` | Fuentes y documentos entregables, excluyendo secretos y artefactos regenerables | Revisión académica con SHA-256 |
 | `integrity-manifest.json` | `scripts/generate-checksum.js` | Artefactos compilados de backend y frontend | Verificador CLI y verificador de arranque |
 
-El manifest JSON inspeccionado contiene 22 entradas: 19 archivos `.js` del backend y 3 archivos del frontend —un `.js`, un `.css` y `index.html`—. El script CLI verifica las 22. El módulo de arranque filtra solo las 19 entradas JavaScript de `backend/dist`; por eso el endpoint no prueba la integridad runtime del frontend.
+El manifest JSON inspeccionado contiene 22 entradas: 19 archivos `.js` del backend y 3 archivos del frontend —un `.js`, un `.css` y `index.html`—. El script CLI y el módulo de arranque verifican todos los archivos que pertenecen a los scopes declarados. El alcance productivo candidato incluye así backend y frontend; su activación pública debe confirmarse después del redespliegue.
 
 Para una entrega académica se generan después de compilar, probar y congelar la versión. Se registran además el commit, la fecha UTC y las versiones de las herramientas.
 
@@ -58,9 +58,8 @@ Para una entrega académica se generan después de compilar, probar y congelar l
 El manifest registra versión de formato, algoritmo, fecha, alcances y una lista ordenada con ruta relativa, SHA-256 y tamaño. No contiene secretos. Debe conservarse junto con exactamente los artefactos que representa.
 
 ```bash
-npm run build:obfuscated
-npm run integrity:generate
-npm run integrity:verify
+npm run render:build
+npm run verify:integrity
 ```
 
 El verificador informa tres grupos: **modificados**, **faltantes** y **nuevos**. Cualquier grupo no vacío produce código de salida `1`, de modo que una canalización puede detener la publicación.
@@ -101,14 +100,14 @@ Desde la raíz:
 npm run integrity:verify
 ```
 
-El resultado válido muestra el número total de archivos coincidentes. Si falla, no debe regenerarse el manifest hasta confirmar que el cambio es autorizado. En producción, el backend repite la comparación de sus archivos JavaScript antes de escuchar conexiones.
+El resultado válido muestra el número total de archivos coincidentes. Si falla, no debe regenerarse el manifest hasta confirmar que el cambio es autorizado. En producción, el backend repite la comparación de los artefactos de runtime declarados —backend y frontend— antes de escuchar conexiones.
 
 Con `STRICT_INTEGRITY=false`, una discrepancia se registra y el servicio continúa con estado `warning`; si falta el manifest, informa `unavailable`. Con `STRICT_INTEGRITY=true`, una discrepancia, un manifest inválido o su ausencia impiden el arranque. De este modo, el modo estricto nunca ejecuta la aplicación sin una comprobación satisfactoria.
 
 | Caso al arrancar | `STRICT_INTEGRITY=false` | `STRICT_INTEGRITY=true` |
 |---|---|---|
-| Manifest válido y backend coincidente | Arranca; estado `verified` | Arranca; estado `verified` |
-| Archivo backend modificado, faltante o nuevo | Registra advertencia; arranca con `warning` | Registra el fallo y no abre el puerto |
+| Manifest válido y scopes coincidentes | Arranca; estado `verified` | Arranca; estado `verified` |
+| Artefacto de runtime modificado, faltante o nuevo | Registra advertencia; arranca con `warning` | Registra el fallo y no abre el puerto |
 | Manifest ausente | Arranca con `unavailable` | No abre el puerto |
 | JSON o formato inválido | Registra advertencia; arranca con `warning` | No abre el puerto |
 
@@ -140,6 +139,14 @@ El resultado esperado es `True`. Para una auditoría completa se repite la compa
 
 Sobre una copia temporal de la entrega, puede modificarse un archivo de prueba y recalcular su hash. El valor debe cambiar. La copia se descarta después; no se modifica evidencia original ni se presenta el manifiesto regenerado como si correspondiera a la entrega anterior.
 
+La demostración automatizada evita por diseño los artefactos productivos:
+
+```bash
+npm run integrity:demo
+```
+
+[`tests/integrity-demo.js`](../tests/integrity-demo.js) crea un directorio temporal, verifica un archivo controlado, lo modifica, confirma la discrepancia y elimina la copia en `finally`. La ejecución del 16-08-2026 detectó correctamente el cambio y terminó con código 0.
+
 > **Espacio de evidencia EV-08-01:** ejecución de generación, número de archivos y primeras líneas anonimizadas del manifiesto.
 
 > **Espacio de evidencia EV-08-02:** verificación exitosa de la entrega congelada.
@@ -165,7 +172,10 @@ npm run build:obfuscated
 node scripts/generate-checksum.js
 
 # Comparar artefactos actuales con el manifest congelado.
-node scripts/verify-integrity.js
+npm run verify:integrity
+
+# Demostrar detección sin tocar artefactos productivos.
+npm run integrity:demo
 
 # Consultar el resumen del despliegue.
 curl https://eduroom-znb0.onrender.com/api/security/integrity
@@ -176,7 +186,7 @@ Orden recomendado para una release:
 ```bash
 npm run build:obfuscated
 node scripts/generate-checksum.js
-node scripts/verify-integrity.js
+npm run verify:integrity
 ```
 
 `npm run build` vuelve a crear el JavaScript normal. Si el manifest se generó después de ofuscar, ejecutar luego el build normal debe provocar una discrepancia; no es un falso positivo, sino una diferencia real de bytes.
@@ -190,7 +200,9 @@ node scripts/verify-integrity.js
 | `npm run build:obfuscated` | Aprobada; 1 JS transformado | El build educativo es reproducible con la semilla actual |
 | Verificación posterior | Aprobada; 22/22 archivos | Manifest y artefactos coincidieron |
 | Sustitución controlada en copia temporal | Falló; código de salida `1` | Detectó el archivo modificado |
-| Endpoint de Render, 15-08-2026 | `verified`; 19 archivos; 0 discrepancias | El backend desplegado coincidió con sus entradas del manifest |
+| Arranque lógico local con `strict=true`, 16-08-2026 | `verified`; 22 archivos; 0 discrepancias | Backend y frontend del candidato coinciden antes de abrir el puerto |
+| `npm run integrity:demo` | Coincidencia inicial y modificación temporal detectada | Demostración segura; no altera producción |
+| Endpoint de Render, 16-08-2026 | HTTP 200; `verified`; 19 archivos; 0 discrepancias | Verificación productiva no bloqueante; todavía corresponde al alcance anterior |
 
 El campo `checkedAt` del endpoint corresponde a la comprobación de arranque, no necesariamente al instante de cada petición. El estado no está firmado y no identifica el commit desplegado.
 
@@ -202,19 +214,21 @@ El campo `checkedAt` del endpoint corresponde a la comprobación de arranque, no
 - Los archivos excluidos no quedan cubiertos por el manifiesto.
 - Un manifiesto válido no demuestra que el software sea seguro o correcto.
 - La verificación al iniciar no detecta por sí sola cambios realizados después del arranque.
-- El endpoint actual verifica solo el backend; una discrepancia exclusiva del frontend requiere el CLI o una ampliación del módulo runtime.
-- El pipeline de Render usa `npm run build` y `STRICT_INTEGRITY=false`; no regenera el manifest ni bloquea por defecto.
+- La configuración candidata verifica backend y frontend, pero el endpoint público no acredita ese alcance hasta redesplegar el commit final.
+- `render.yaml` usa `npm run render:build` y `STRICT_INTEGRITY=true`; un fallo del manifest bloqueará el arranque, por lo que debe conservarse un procedimiento de rollback.
 - El estado público evita hashes completos, pero sigue siendo una señal informativa y no una prueba remota firmada.
 
 Para elevar la confianza, el manifiesto puede firmarse digitalmente y su clave pública o huella debe distribuirse por un canal independiente y confiable. Las evidencias originales también requieren controles de acceso, respaldo y cadena de custodia.
 
 ## 8.11 Recomendaciones
 
-1. Ejecutar `npm run release:educational` en CI y adjuntar el manifest a la misma release.
-2. Verificar también los artefactos del frontend antes de publicar o ampliar el runtime con un alcance explícito.
-3. Activar `STRICT_INTEGRITY=true` únicamente después de probar recuperación y ubicación del manifest en Render.
+1. Mantener `npm run render:build` en la canalización y adjuntar el manifest a la misma release.
+2. Confirmar mediante el endpoint que el deploy final verifica backend y frontend con el conteo esperado.
+3. Probar recuperación, rollback y ubicación del manifest antes de promover el candidato estricto.
 4. Firmar el manifest y publicar la huella de la clave por un canal independiente.
 5. Añadir al endpoint un identificador no sensible de versión o commit para correlacionar evidencia.
+
+La validación completa del modo estricto, alcance, endpoint y diferencias frente a firma digital está en [28. Validación de `STRICT_INTEGRITY`](28-validacion-strict-integrity.md).
 
 ## 8.12 Referencias base
 

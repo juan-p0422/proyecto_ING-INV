@@ -239,6 +239,22 @@ Para la mayoría de los objetivos, el monitor de rendimiento y las métricas agr
 
 Las mediciones del navegador son muestras, no pruebas de la infraestructura interna ni evaluaciones exhaustivas de seguridad.
 
+### 4.7.4 Medición concreta de EduRoom y cierre pendiente de Classroom
+
+El procedimiento reproducible y los resultados se documentan en [25. Medición de Performance y Memory](25-medicion-performance-memory.md). Una navegación pública controlada de EduRoom en Render, ejecutada el `2026-08-16T06:42:33.184Z` con Chromium 151 y viewport 1280 × 720, obtuvo:
+
+| Métrica | Resultado puntual |
+|---|---:|
+| Load time | 481.60 ms |
+| DOMContentLoaded | 481.30 ms |
+| Recursos aproximados, incluido documento | 5 |
+| Transferencia aproximada | 93,361 bytes |
+| JS heap usado aproximado | 2,185,404 bytes |
+
+La evidencia estructurada está en [`evidence/performance/eduroom/`](../evidence/performance/eduroom/) y se genera con `npm run performance:eduroom`. Es una muestra del cliente público, no de la memoria del servidor ni un benchmark estadístico.
+
+Para Google Classroom se mantiene **[PENDIENTE DE MEDICIÓN MANUAL]**. Las capturas Performance/Memory deben ser obtenidas y validadas manualmente; no se automatiza la plataforma ni se publican snapshots de heap.
+
 ## 4.8 Tabla de hallazgos esperados
 
 Esta tabla sirve como hipótesis de observación. Debe completarse con resultados reales sin copiar detalles sensibles.

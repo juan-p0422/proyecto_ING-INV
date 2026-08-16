@@ -22,10 +22,10 @@ La seguridad principal continúa basada en autenticación, autorización en serv
 
 | Mecanismo | Estado en el código | Estado en el despliegue declarado | Dictamen |
 |---|---|---|---|
-| Checksum SHA-256 de artefactos | Implementado | El arranque verifica el JavaScript compilado del backend | Implementado con alcance parcial en runtime |
-| Endpoint de integridad | Implementado y público | Respondió `verified`, 19 archivos y 0 discrepancias el 15-08-2026 | Operativo |
+| Checksum SHA-256 de artefactos | Implementado | El candidato verifica scopes de backend y frontend antes del puerto | Implementado; producción aún muestra alcance anterior de 19 |
+| Endpoint de integridad | Implementado y público | Respondió `verified`, 19 archivos y 0 discrepancias el 16-08-2026 | Operativo, no firmado |
 | AES-256-GCM | Implementado y usado por `SecureNote` | `APP_ENCRYPTION_KEY` se genera como secreto en Render | Implementado |
-| Ofuscación del frontend | Implementada como build optativo | `render.yaml` y los Dockerfiles ejecutan el build normal | Disponible, pero no demostrada en el deploy actual |
+| Ofuscación del frontend | Implementada y demostrada localmente | `render.yaml` declara `npm run render:build`; falta acreditar el redespliegue | Cumple como técnica de dificultad, no de invisibilidad |
 | Diagnóstico antidebug | Implementado | Se ejecuta antes de abrir el puerto | Educativo y no bloqueante |
 
 “Implementado” no significa invulnerable. El endpoint público refleja la verificación ejecutada por el backend al arrancar y no acredita que el frontend servido esté ofuscado.
@@ -44,7 +44,7 @@ Se excluyen `.git`, `node_modules`, temporales y extensiones fuera del alcance. 
 Existen dos alcances de verificación:
 
 - `scripts/verify-integrity.js` compara todos los archivos declarados en los scopes; en el manifest auditado fueron 22: 19 JavaScript del backend y 3 artefactos del frontend.
-- `backend/src/security/checksum.ts` filtra únicamente entradas `backend/dist/**/*.js`. Por ello el endpoint informó 19 archivos, aunque el manifest contiene también frontend. Una alteración exclusiva del frontend es detectada por el CLI, pero no por el estado runtime actual.
+- `backend/src/security/checksum.ts` verifica todos los archivos pertenecientes a los scopes del manifest. El candidato local verificó 22/22, incluido frontend. El endpoint público todavía informó 19 porque corresponde al despliegue anterior.
 
 ## 7.4 Verificación al iniciar
 
@@ -104,7 +104,7 @@ La señal del cliente puede alterarse y es solo informativa. La política estric
 ## 7.8 Generación de una entrega educativa
 
 ```bash
-npm run release:educational
+npm run render:build
 ```
 
 El comando compila el backend, genera el frontend ofuscado, crea el manifest y verifica inmediatamente el resultado. También pueden ejecutarse las etapas por separado:
@@ -117,7 +117,7 @@ npm run integrity:verify
 
 El manifest debe generarse **después** de la última transformación. Si se recompila u ofusca nuevamente, los bytes cambian y se requiere un manifest nuevo asociado a esa versión.
 
-El pipeline declarativo actual de Render usa `npm run build`, no `npm run release:educational`. Los Dockerfiles también ejecutan el build normal. Por tanto, no debe afirmarse que la versión pública esté ofuscada sin cambiar el pipeline, desplegar de nuevo y conservar evidencia del artefacto. La recomendación es usar la secuencia educativa en una canalización controlada y, después de validar recuperación, considerar `STRICT_INTEGRITY=true`.
+El Blueprint actual declara `npm run render:build` y `STRICT_INTEGRITY=true`; Docker aplica la misma secuencia educativa. Ambos fueron validados localmente. No debe afirmarse que la versión pública ya use el candidato sin desplegar el commit final y conservar evidencia del artefacto.
 
 ## 7.9 Reacción ante modificaciones
 
@@ -134,16 +134,16 @@ Una diferencia no implica automáticamente un ataque: también puede deberse a u
 - Un atacante capaz de cambiar archivos y manifest puede generar hashes coherentes.
 - SHA-256 aporta integridad comparativa, no identidad del autor.
 - La comprobación ocurre al arranque; cambios posteriores requieren una nueva verificación o reinicio.
-- La comprobación runtime actual cubre solo JavaScript del backend; el frontend requiere el verificador CLI o ampliar el módulo del servidor.
+- La comprobación candidata cubre backend y frontend; la URL pública aún expone el conteo anterior de 19 archivos.
 - La ofuscación puede revertirse y no protege secretos incluidos por error.
 - El endpoint resume el estado del backend; no vuelve confiable al navegador.
 - Variables de instrumentación son señales débiles y pueden ser legítimas.
 - El control no reemplaza firma digital, arranque verificado, permisos del sistema o monitoreo.
 
-## 7.11 Resultado de validación del 15-08-2026
+## 7.11 Resultado de validación del 16-08-2026
 
 - `npm run build`: aprobado; produjo el bundle normal.
-- `npm test`: aprobado; 9 pruebas de backend y 2 de frontend.
+- `npm test`: aprobado; 10 pruebas de backend y 2 de frontend.
 - `npm run build:obfuscated`: aprobado; procesó un archivo JavaScript.
 - `node scripts/verify-integrity.js` después del build ofuscado: aprobado, 22 archivos coincidentes.
 - Prueba controlada sobre una copia temporal: una sustitución produjo código de salida `1` y clasificó un archivo como modificado.
@@ -151,7 +151,13 @@ Una diferencia no implica automáticamente un ataque: también puede deberse a u
 
 La comprobación evidencia funcionamiento para los casos ejecutados. No es una certificación, no garantiza ausencia de vulnerabilidades y no convierte el endpoint en una atestación remota firmada.
 
-## 7.12 Evidencias sugeridas para presentación
+## 7.12 Observabilidad del cliente web
+
+HTML, CSS y JavaScript deben descargarse al navegador y pueden inspeccionarse mediante DevTools. EduRoom no trata esa propiedad como un fallo ni confía en ocultar el bundle: los secretos, permisos y decisiones se mantienen en Express. La ofuscación dificulta lectura casual y la integridad detecta cambios, pero el cliente continúa siendo observable y modificable localmente.
+
+El análisis completo, los controles implementados y las mejoras futuras se documentan en [29. Limitaciones de protección del cliente web](29-limitaciones-proteccion-cliente-web.md).
+
+## 7.13 Evidencias sugeridas para presentación
 
 | Evidencia | Demostración segura |
 |---|---|

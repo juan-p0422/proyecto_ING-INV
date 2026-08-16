@@ -1,0 +1,57 @@
+SEC-07 — Prueba reproducible de build ofuscado
+================================================
+
+Fecha local: 2026-08-16
+Entorno: Windows / PowerShell, Node.js >= 20
+Repositorio: proyecto_ING-INV
+Alcance: candidato local; no acredita por sí solo un redespliegue en Render
+
+Comando principal:
+
+  npm run render:build
+
+Secuencia ejecutada por el comando:
+
+  npm ci --include=dev --prefix backend
+  npm ci --include=dev --prefix frontend
+  npm run release:educational
+    -> npm run build:obfuscated
+    -> npm run integrity:generate
+    -> npm run integrity:verify
+
+Resultados observados:
+
+  - Backend TypeScript compilado correctamente.
+  - Frontend Vite: 62 módulos transformados.
+  - Bundle JavaScript generado: frontend/dist/assets/index-BmPgmr7d.js.
+  - Ofuscación educativa aplicada a 1 archivo JavaScript.
+  - integrity-manifest.json generado con 22 artefactos.
+  - Verificación: 22 archivos coinciden con el manifest.
+  - Código de salida del pipeline: 0.
+
+Comprobaciones adicionales:
+
+  npm run verify:integrity
+  node --check frontend/dist/assets/index-BmPgmr7d.js
+  npm test
+
+Resultados adicionales:
+
+  - Alias verify:integrity: correcto, 22/22 artefactos.
+  - Sintaxis del bundle ofuscado: válida.
+  - Backend: 10/10 pruebas aprobadas.
+  - Frontend: 2/2 pruebas aprobadas.
+
+Conclusión:
+
+La estrategia es reproducible y estable en la validación local. render.yaml invoca
+npm run render:build, por lo que el pipeline declarado de Render incluye la misma
+release ofuscada. Para atribuir el comportamiento a la URL pública todavía se requiere
+redesplegar el commit final y conservar RND-02-successful-deploy.png y
+RND-05-logs-startup.png.
+
+Limitación:
+
+La ofuscación dificulta la lectura casual del JavaScript, pero el navegador debe recibir
+el bundle y un analista puede observarlo o estudiarlo. No es cifrado, no vuelve invisible
+el frontend y no impide por completo la ingeniería inversa.

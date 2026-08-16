@@ -264,6 +264,23 @@ Build con ofuscación del JavaScript:
 npm run build:obfuscated
 ```
 
+Comandos equivalentes al Blueprint de Render:
+
+```bash
+npm run render:build
+npm run render:start
+```
+
+`render:build` instala dependencias de backend y frontend mediante `npm ci`, compila el backend, genera el build Vite, ofusca los JavaScript resultantes, genera el manifest y lo verifica. Express sirve directamente `frontend/dist`, por lo que no se realiza una copia redundante a `backend/public`.
+
+Demostración aislada de detección de cambios:
+
+```bash
+npm run integrity:demo
+```
+
+El script usa únicamente un directorio temporal, verifica una coincidencia, modifica el archivo temporal y demuestra la discrepancia antes de limpiar. No altera artefactos productivos.
+
 Release educativa coherente:
 
 ```bash
@@ -282,11 +299,14 @@ También pueden ejecutarse las etapas:
 ```bash
 node scripts/generate-checksum.js
 node scripts/verify-integrity.js
+npm run verify:integrity
 ```
 
 El manifest debe generarse después de la última transformación. `npm run build` produce bytes distintos del build ofuscado y puede hacer que un manifest anterior falle correctamente.
 
-El verificador CLI cubre 22 artefactos del manifest actual. El verificador de arranque y `/api/security/integrity` resumen 19 archivos JavaScript del backend. En `render.yaml`, `STRICT_INTEGRITY` permanece en `false`.
+La validación local del 16-08-2026 cubrió 22 artefactos del manifest. El candidato actual configura `STRICT_INTEGRITY=true` y verifica los scopes de backend y frontend antes del arranque. La URL pública solo puede atribuirse a este candidato después de redesplegar el commit final y conservar evidencia del mismo build.
+
+El endpoint público observado el 16-08-2026 respondió HTTP 200 con `status=verified`, `filesChecked=19` y cero discrepancias. Esto acredita detección productiva sobre el alcance anterior, pero el endpoint no expone el flag estricto ni el commit. Véase [`docs/28-validacion-strict-integrity.md`](docs/28-validacion-strict-integrity.md).
 
 ## Prisma: migraciones y seed
 
@@ -341,7 +361,8 @@ No cargar estas credenciales conocidas en Render ni en otro ambiente público. E
 
 - PostgreSQL administrado;
 - un servicio web Node;
-- build de backend y frontend;
+- `npm run render:build`: instalación limpia, backend, frontend ofuscado y manifest verificado;
+- `npm run render:start`: migraciones y arranque del backend;
 - migraciones antes del arranque;
 - healthcheck en `/api/health`;
 - generación de `JWT_SECRET` y `APP_ENCRYPTION_KEY`;
@@ -361,7 +382,7 @@ curl https://eduroom-znb0.onrender.com/api/health
 curl https://eduroom-znb0.onrender.com/api/security/integrity
 ```
 
-El build declarado actualmente ejecuta `npm run build`, no el build ofuscado. Para acreditar ofuscación en producción se debe actualizar la canalización, redesplegar y conservar evidencia. El procedimiento completo está en [`docs/10-despliegue-render.md`](docs/10-despliegue-render.md).
+El Blueprint declara el build ofuscado mediante `npm run render:build`. La secuencia fue demostrada localmente con código de salida 0, un JavaScript transformado, manifest de 22 artefactos y 12 pruebas aprobadas. Esta prueba acredita la técnica y la estabilidad del candidato, pero no demuestra que la URL pública ya ejecute ese commit: falta redesplegar y conservar `RND-02-successful-deploy.png` y `RND-05-logs-startup.png`. La evidencia reproducible está en [`evidence/security/SEC-07-obfuscated-build-proof.txt`](evidence/security/SEC-07-obfuscated-build-proof.txt).
 
 ## Endpoints principales
 
@@ -474,7 +495,9 @@ La prueba de fallo debe ejecutarse solo sobre una copia temporal. No regenerar e
 | [19 - Diapositivas](docs/19-presentacion-diapositivas.md) | Estructura de 15 diapositivas |
 | [20 - Validación de seguridad](docs/20-validacion-seguridad-producto.md) | Checksum, cifrado, ofuscación y antireversing |
 | [21 - Matriz de rúbrica](docs/21-matriz-cumplimiento-rubrica.md) | Auditoría final y acciones pendientes |
-| [Comparativo listo para PDF](docs/pdf/comparativo-ui-print.md) | Maquetación imprimible del comparativo |
+| [Comparativo listo para PDF](docs/26-comparativo-ui-print.md) | Maquetación imprimible del comparativo |
+| [27 - Evidencias técnicas finales](docs/27-evidencias-tecnicas-finales.md) | Inventario y estado de pruebas visuales/técnicas |
+| [28 - Validación strict integrity](docs/28-validacion-strict-integrity.md) | Arranque, scopes, fallo controlado y estado real de Render |
 
 ## Evidencias
 
@@ -513,8 +536,8 @@ El guion incluye dos perfiles de navegador, demo profesor-estudiante, endpoint d
 - El modelo incluye adjuntos, pero no existe carga binaria ni almacenamiento de archivos.
 - No se implementan recuperación de cuenta, notificaciones, rúbricas, auditoría completa ni limpieza de datos QA.
 - Las pruebas contra Render crean datos sintéticos persistentes.
-- `STRICT_INTEGRITY=false` prioriza disponibilidad; el endpoint runtime verifica el backend, no todo el frontend.
-- El pipeline actual de Render compila sin ofuscación.
+- El candidato configura integridad estricta y build ofuscado; falta evidencia de que el deploy público haya sido actualizado al mismo commit.
+- La ofuscación dificulta lectura casual, pero el frontend permanece observable y susceptible de análisis.
 - SHA-256 no firma el manifest y la ofuscación no vuelve secreto el código del navegador.
 - AES-GCM protege únicamente `SecureNote.encryptedPayload`; no todo el sistema.
 - No existe rotación de `APP_ENCRYPTION_KEY` ni KMS/HSM.

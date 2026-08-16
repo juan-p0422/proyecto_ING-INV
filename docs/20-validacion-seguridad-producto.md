@@ -21,7 +21,7 @@ EduRoom implementa los cuatro mecanismos solicitados, pero con alcances diferent
 - **Ofuscación:** transformación moderada del JavaScript compilado mediante `javascript-obfuscator`.
 - **Antireversing educativo:** diagnóstico de variables asociadas a instrumentación, aviso de producción y visualización del estado de integridad.
 
-El dictamen es **cumplimiento técnico con advertencias**. Cifrado y checksum están implementados y probados. La ofuscación funciona localmente, pero el pipeline declarado de Render utiliza el build normal; por ello no se afirma que el bundle público actual esté ofuscado. El endpoint de integridad verifica 19 archivos JavaScript del backend, mientras que el verificador CLI cubre las 22 entradas del manifest, incluido el frontend.
+El dictamen es **cumplimiento técnico con advertencias**. Cifrado, checksum y ofuscación están implementados y probados. `render.yaml` invoca ahora `npm run render:build`, y la misma secuencia terminó localmente con un JavaScript ofuscado, manifest 22/22 y 12 pruebas aprobadas. Esto acredita el candidato y la demostración reproducible; no se afirma que el bundle público actual esté ofuscado hasta redesplegar el commit final y conservar evidencia de Render.
 
 ## 20.3 Tabla de mecanismos implementados
 
@@ -29,12 +29,13 @@ El dictamen es **cumplimiento técnico con advertencias**. Cifrado y checksum es
 |---|---|---|---|---|---|
 | Generación SHA-256 | `scripts/generate-checksum.js` | Crear manifest de artefactos | `node scripts/generate-checksum.js` después del build final | JSON válido y número de archivos | Consola con conteo y copia de `integrity-manifest.json` |
 | Verificación CLI | `scripts/verify-integrity.js` | Detectar modificados, faltantes y nuevos | `node scripts/verify-integrity.js` | Salida 0 si coincide; 1 ante discrepancia | Log de éxito y prueba controlada en copia |
-| Verificación de arranque | `backend/src/security/checksum.ts` | Comprobar backend antes de escuchar | Iniciar con `STRICT_INTEGRITY=false/true` en entorno controlado | Advertir o bloquear según política | Log de arranque sanitizado |
+| Demostración aislada | `tests/integrity-demo.js` | Probar detección sin tocar producción | `npm run integrity:demo` | Coincidencia inicial, discrepancia detectada y limpieza | [Validación estricta](28-validacion-strict-integrity.md) |
+| Verificación de arranque | `backend/src/security/checksum.ts` | Comprobar los scopes de runtime antes de escuchar | Iniciar con `STRICT_INTEGRITY=false/true` en entorno controlado | Advertir o bloquear según política | Log de arranque sanitizado |
 | Manifest de build | `integrity-manifest.json` | Congelar hashes, tamaños, scopes y fecha | Revisar esquema y comparar con artefactos | `version=1`, `algorithm=sha256` | Fragmento sin necesidad de mostrar todos los hashes |
 | Endpoint de integridad | `backend/src/routes/security.ts` | Publicar estado resumido | `curl .../api/security/integrity` | Estado y contadores, sin rutas ni hashes | Respuesta JSON fechada |
 | AES-256-GCM | `backend/src/security/crypto.ts` | Confidencialidad y autenticidad del campo | Ejecutar `crypto.test.ts` | Ida y vuelta, IV distinto y alteración rechazada | Resultado de cuatro pruebas |
 | Uso del cifrado | `backend/src/routes/security.ts`, `backend/prisma/schema.prisma` | Cifrar notas antes de persistirlas | Crear nota sintética y revisar DB controlada | No aparece el marcador en `encryptedPayload` | Captura censurada de payload y recuperación |
-| Ofuscación | `frontend/scripts/obfuscate-build.cjs` | Dificultar lectura casual del bundle | `npm run build:obfuscated` | JavaScript transformado y aplicación funcional | Log, tamaño y hash del bundle |
+| Ofuscación | `frontend/scripts/obfuscate-build.cjs` | Dificultar lectura casual del bundle | `npm run render:build` | JavaScript transformado, manifest verificado y pruebas aprobadas | [`SEC-07`](../evidence/security/SEC-07-obfuscated-build-proof.txt) |
 | Diagnóstico antidebug | `backend/src/security/antiDebug.ts` | Advertir señales ambientales | Arrancar una copia con variable de prueba | Advertencia con nombre, sin valor ni bloqueo | Log sanitizado |
 | Estado visual | `frontend/src/security/clientIntegrity.ts`, `DashboardPage.tsx` | Mostrar el estado del backend | Abrir dashboard | Verificada, advertencia o no disponible | Captura del panel |
 
@@ -95,7 +96,7 @@ El CLI valida formato y algoritmo, recalcula hashes y clasifica:
 
 Cualquier discrepancia produce código de salida `1`.
 
-El backend ejecuta `verifyBackendIntegrity` antes de abrir el puerto. Ese módulo filtra solo `backend/dist/**/*.js`; no verifica actualmente el frontend aunque esté declarado en el manifest.
+El backend ejecuta `verifyRuntimeIntegrity` antes de abrir el puerto. El módulo valida todos los archivos pertenecientes a los scopes del manifest, incluidos `backend/dist` y `frontend/dist`, y detecta archivos modificados, faltantes o nuevos.
 
 ### 20.4.5 Efecto de modificar un archivo
 
@@ -120,7 +121,7 @@ Con `STRICT_INTEGRITY=false`, el backend registra la anomalía y prioriza dispon
 | Manifest ausente | Arranca como `unavailable` | Impide abrir el puerto |
 | Manifest inválido | Advierte y arranca como `warning` | Impide abrir el puerto |
 
-`render.yaml` configura actualmente `STRICT_INTEGRITY=false`. Esto favorece disponibilidad, pero permite iniciar ante una advertencia. El cambio a modo estricto debe acompañarse de una canalización reproducible y un procedimiento de recuperación.
+`render.yaml` configura el candidato con `STRICT_INTEGRITY=true`. Una discrepancia impide abrir el puerto; por eso la promoción debe acompañarse de la canalización reproducible ya declarada, una verificación previa y un procedimiento de recuperación. El deploy observado el 15-08-2026 usaba todavía `false` y se conserva como resultado histórico, no como estado del candidato.
 
 ### 20.4.7 Endpoint
 
@@ -128,25 +129,25 @@ Con `STRICT_INTEGRITY=false`, el backend registra la anomalía y prioriza dispon
 curl https://eduroom-znb0.onrender.com/api/security/integrity
 ```
 
-Resultado observado:
+Resultado observado nuevamente el 16-08-2026:
 
 ```json
 {
   "status": "verified",
-  "checkedAt": "2026-08-15T23:32:23.187Z",
+  "checkedAt": "2026-08-16T07:22:30.662Z",
   "filesChecked": 19,
   "modifiedFilesCount": 0
 }
 ```
 
-La respuesta no publica hashes, rutas ni variables. `checkedAt` indica el momento de comprobación durante el arranque, no el momento de la consulta. Los 19 archivos corresponden al backend.
+La respuesta no publica hashes, rutas, el flag estricto, commit ni variables. `checkedAt` indica el momento de comprobación durante el arranque, no el momento de la consulta. Los 19 archivos corresponden al alcance anterior del backend. El candidato local estricto verificó 22/22, incluido el frontend. Detalles y hora de consulta: [documento 28](28-validacion-strict-integrity.md).
 
 ### 20.4.8 Limitaciones
 
 - El manifest no está firmado.
 - Quien pueda sustituir archivos, manifest y verificador puede producir un conjunto coherente.
 - La verificación runtime ocurre al iniciar, no continuamente.
-- El frontend solo queda cubierto por el verificador CLI.
+- El frontend queda cubierto por CLI y arranque en el candidato; falta confirmar el nuevo alcance en la URL pública.
 - Los archivos fuera de los scopes no se verifican.
 - El endpoint no identifica el commit desplegado.
 - Un hash coincidente no demuestra corrección ni ausencia de vulnerabilidades.
@@ -258,14 +259,16 @@ La ofuscación conserva un programa ejecutable que puede estudiarse. Base64 tamp
 
 ### 20.6.4 Estado en Render
 
-`render.yaml` ejecuta `npm run build`. Los Dockerfiles también usan el build normal. En consecuencia:
+`render.yaml` ejecuta `npm run render:build`; este comando instala dependencias y ejecuta `release:educational`. `backend/Dockerfile` aplica la misma estrategia antes de generar el manifest. En consecuencia:
 
 - el mecanismo está implementado;
-- el build ofuscado fue probado localmente;
-- el deploy actual no puede declararse ofuscado basándose en la configuración versionada;
-- el endpoint de integridad no permite inferir ofuscación del frontend.
+- el build ofuscado fue probado localmente el 16-08-2026 con código 0;
+- el candidato productivo genera y verifica el manifest después de ofuscar;
+- la sintaxis del bundle y 12 pruebas automatizadas resultaron correctas;
+- el deploy público no puede declararse ofuscado hasta redesplegar y conservar evidencia del artefacto;
+- el endpoint de integridad acredita coincidencia de bytes, pero por sí solo no demuestra cómo se transformó el frontend.
 
-Para activarlo, la canalización debe ejecutar el build ofuscado, generar el manifest después de la transformación, verificarlo y redesplegar. Ese cambio debe probarse antes de habilitar modo estricto.
+La técnica queda **cumplida documentalmente y demostrada localmente** mediante [`SEC-07-obfuscated-build-proof.txt`](../evidence/security/SEC-07-obfuscated-build-proof.txt). Para atribuirla al deploy público todavía se debe redesplegar la canalización corregida y capturar el log de build y el manifest. La ofuscación sigue siendo una transformación analizable y no reemplaza autorización, cifrado ni gestión de secretos.
 
 ### 20.6.5 Limitaciones
 
@@ -343,12 +346,15 @@ npm run build:obfuscated
 
 # 5. Para una release coherente, regenerar y verificar después de ofuscar.
 node scripts/generate-checksum.js
-node scripts/verify-integrity.js
+npm run verify:integrity
 
 # 6. Ejecutar pruebas unitarias.
 npm test
 
-# 7. Consultar Render.
+# 7. Reproducir exactamente el build declarado en Render.
+npm run render:build
+
+# 8. Consultar Render después del redespliegue.
 curl https://eduroom-znb0.onrender.com/api/security/integrity
 ```
 
@@ -365,23 +371,26 @@ Advertencia: ejecutar el generador modifica `integrity-manifest.json`. Solo debe
 | ID | Verificación | Resultado | Estado |
 |---|---|---|---|
 | VAL-01 | Build normal | Compilación completa | Aprobado |
-| VAL-02 | Pruebas automatizadas | 9 backend + 2 frontend | Aprobado |
+| VAL-02 | Pruebas automatizadas | 10 backend + 2 frontend | Aprobado |
 | VAL-03 | Pruebas AES-GCM | 4/4 | Aprobado |
 | VAL-04 | Build ofuscado | 1 JavaScript transformado | Aprobado |
 | VAL-05 | Integridad después de ofuscar | 22/22 | Aprobado |
 | VAL-06 | Alteración controlada en copia | Detectada; salida 1 | Aprobado |
 | VAL-07 | Endpoint Render | `verified`, 19, 0 | Aprobado con alcance backend |
-| VAL-08 | `STRICT_INTEGRITY` de Render | Configurado en `false` | Advertencia |
-| VAL-09 | Ofuscación en pipeline Render | No incluida en `buildCommand` | Advertencia |
+| VAL-08 | `STRICT_INTEGRITY` observado el 15-08-2026 | Configurado en `false` | Resultado histórico; candidato corregido pendiente de deploy |
+| VAL-09 | Ofuscación en pipeline observado el 15-08-2026 | No incluida entonces en `buildCommand` | Resultado histórico; candidato corregido pendiente de deploy |
 | VAL-10 | Firma del manifest | No implementada | Recomendación |
+| VAL-11 | Pipeline candidato `npm run render:build`, 16-08-2026 | 1 JS ofuscado, manifest 22/22, código 0 | Aprobado localmente; redespliegue pendiente |
+| VAL-12 | `npm run integrity:demo`, 16-08-2026 | Modificación temporal detectada y copia eliminada | Aprobado |
+| VAL-13 | `verifyRuntimeIntegrity({strict:true})`, 16-08-2026 | 22 archivos, cero discrepancias | Aprobado localmente |
 
 ## 20.10 Hallazgos y recomendaciones
 
 | ID | Hallazgo | Impacto | Recomendación | Prioridad |
 |---|---|---|---|---|
-| H-01 | Runtime verifica solo backend | Una modificación exclusiva del frontend no cambia el endpoint | Ampliar alcance o verificar en CI antes de publicar | Media |
-| H-02 | Render usa build normal | No puede acreditarse ofuscación del deploy | Crear pipeline de release con build ofuscado y evidencia | Media |
-| H-03 | `STRICT_INTEGRITY=false` | Una discrepancia del backend no detiene arranque | Activar tras probar manifest y recuperación | Media |
+| H-01 | Alcance completo todavía sin evidencia pública | No puede atribuirse el conteo backend/frontend al deploy vigente | Redesplegar y capturar el endpoint del mismo commit | Media |
+| H-02 | Build ofuscado todavía sin evidencia pública | No puede acreditarse ofuscación del deploy vigente | Capturar pipeline, bundle y manifest del candidato | Media |
+| H-03 | Modo estricto todavía sin evidencia pública | No se ha observado el arranque productivo con bloqueo | Probar manifest, recuperación y deploy final | Media |
 | H-04 | Manifest sin firma | Puede sustituirse junto con archivos | Firmar y distribuir huella confiable | Media |
 | H-05 | Clave única sin rotación | Cambio o pérdida afecta todas las notas | Versionar claves y definir rotación | Media |
 | H-06 | Antidebug basado en señales débiles | Evasión y falsos positivos | Mantenerlo informativo; no usarlo como control de acceso | Baja |
@@ -391,18 +400,24 @@ Advertencia: ejecutar el generador modifica `integrity-manifest.json`. Solo debe
 | Evidencia | Contenido | Criterio de aceptación |
 |---|---|---|
 | EV-20-01 | Salida de `npm run build` | Backend y frontend completan |
-| EV-20-02 | Salida de build ofuscado | Número de JS transformados |
+| EV-20-02 | [`SEC-07-obfuscated-build-proof.txt`](../evidence/security/SEC-07-obfuscated-build-proof.txt) | Build ofuscado, manifest, sintaxis y pruebas |
 | EV-20-03 | Manifest | Algoritmo, fecha, scopes y conteo |
 | EV-20-04 | Verificación correcta | 22 archivos coincidentes |
-| EV-20-05 | Modificación controlada | Grupo “Modificados” y código 1 |
+| EV-20-05 | [`tests/integrity-demo.js`](../tests/integrity-demo.js) | Modificación temporal detectada sin tocar producción |
 | EV-20-06 | Endpoint Render | Estado, fecha y contadores |
 | EV-20-07 | Pruebas AES-GCM | Cuatro casos aprobados |
 | EV-20-08 | Payload de nota segura | IV, auth tag y ciphertext; sin texto ni clave |
 | EV-20-09 | Recuperación autorizada | Propietario recupera; otro usuario no |
 | EV-20-10 | Diagnóstico antidebug | Nombre de señal sin valor y servicio operativo |
 
-## 20.12 Conclusión
+## 20.12 Observabilidad y frontera de confianza del cliente web
+
+HTML, CSS y JavaScript deben descargarse al navegador, por lo que el usuario puede inspeccionarlos, formatearlos, depurarlos o modificar su estado local. EduRoom no presenta esa observabilidad como una brecha reparable ni basa la seguridad en ocultar rutas o botones. El backend vuelve a validar JWT, roles, membresía, propiedad y entradas antes de ejecutar operaciones; bcrypt protege las contraseñas almacenadas; CORS, límites HTTP, cifrado AES-GCM, checksums e integridad complementan el modelo según su alcance.
+
+La ofuscación transforma el bundle propio y aumenta el coste de lectura, pero no impide la ingeniería inversa ni protege secretos. El checksum detecta diferencias frente a un manifest confiable, pero no reemplaza una firma digital. Con estos límites explícitos, el control se clasifica como **Cumple con limitación técnica documentada**. El análisis completo y las mejoras propuestas —CSP estricta, SRI, firma de artefactos, attestations, monitoreo, auditoría y hardening— se encuentran en [29. Limitaciones de protección del cliente web](29-limitaciones-proteccion-cliente-web.md).
+
+## 20.13 Conclusión
 
 EduRoom demuestra checksum SHA-256, cifrado AES-256-GCM, ofuscación de JavaScript y diagnóstico antireversing educativo mediante código verificable. La implementación distingue correctamente integridad, confidencialidad y dificultad de análisis, y evita controles destructivos.
 
-El cumplimiento debe presentarse con dos reservas: el endpoint runtime cubre el backend, no todo el manifest; y la configuración declarativa de Render no activa el build ofuscado. Estas limitaciones no invalidan la implementación académica, pero impiden afirmar cobertura integral o protección productiva fuerte. Las siguientes mejoras recomendadas son integrar la release educativa en CI, ampliar o trasladar la verificación del frontend, firmar el manifest y establecer rotación de claves.
+La configuración candidata corrige dos reservas de la auditoría: el runtime cubre todos los scopes del manifest y Render declara la release educativa con modo estricto. Estas mejoras no autorizan a afirmar que el deploy público ya las ejecuta hasta completar el redespliegue y su evidencia. Tampoco convierten la ofuscación en confidencialidad: el cliente sigue siendo observable. Permanecen como mejoras posteriores la firma del manifest y la rotación de claves.

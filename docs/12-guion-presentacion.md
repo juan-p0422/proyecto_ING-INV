@@ -4,7 +4,7 @@
 
 **Tema:** ingeniería inversa ética de Google Classroom y réplica académica independiente
 
-**Duración objetivo:** 10 minutos y 20 segundos; rango aceptable de 8 a 12 minutos
+**Duración objetivo:** 10 minutos y 55 segundos; rango aceptable de 8 a 12 minutos
 
 **Aplicación:** [https://eduroom-znb0.onrender.com](https://eduroom-znb0.onrender.com)
 
@@ -24,20 +24,24 @@ La exposición distingue tres niveles:
 
 | Tiempo | Bloque | Resultado que debe quedar claro |
 |---|---|---|
-| 0:00–0:30 | Portada | Qué se construyó y dónde se verifica |
-| 0:30–1:10 | Problema | Qué exigía el examen y por qué se eligió Classroom |
-| 1:10–1:45 | Alcance ético | Qué se observó y qué acciones se excluyeron |
-| 1:45–2:25 | Metodología | Cómo se pasó de observación a implementación |
-| 2:25–3:05 | Análisis de referencia | Flujos, entradas, salidas, tecnologías y memoria |
-| 3:05–3:40 | Modelo reconstruido | Entidades y relaciones conceptuales |
-| 3:40–4:20 | Arquitectura de EduRoom | Frontend, backend, base, GitHub y Render |
-| 4:20–7:30 | Demostración en vivo | Flujo profesor–estudiante completo |
-| 7:30–8:20 | Seguridad | Diferencia entre autenticación, cifrado, checksum y ofuscación |
-| 8:20–9:05 | Pruebas | Evidencia API, defensiva y visual |
-| 9:05–9:45 | Comparativo, resultados y límites | Correspondencia funcional sin copia visual |
-| 9:45–10:20 | Conclusión | Aprendizaje y valor profesional |
+| 0:00–0:25 | 1. Portada | Qué se construyó y dónde se verifica |
+| 0:25–0:55 | 2. Consigna | Analizar, reconstruir, implementar, proteger y demostrar |
+| 0:55–1:25 | 3. Objetivos | Comprender, reconstruir y validar |
+| 1:25–2:00 | 4. Classroom | Referencia funcional observada, no código propietario |
+| 2:00–2:35 | 5. Metodología ética | Qué se observó y qué acciones se excluyeron |
+| 2:35–3:20 | 6. Análisis dinámico | Network, Application, Performance y Memory |
+| 3:20–4:00 | 7. Modelo reconstruido | Entidades y relaciones conceptuales propias |
+| 4:00–4:40 | 8. Arquitectura | Frontend, backend, PostgreSQL, GitHub y Render |
+| 4:40–5:55 | 9. Demo funcional | Flujo profesor–estudiante completo o respaldo visual |
+| 5:55–6:40 | 10. Pruebas en Render | Resultados secuenciales y alcance probado |
+| 6:40–7:30 | 11. Seguridad | Autenticación, cifrado y checksum |
+| 7:30–8:10 | 12. Antireversing | Ofuscación, cliente observable y control servidor |
+| 8:10–9:00 | 13. Comparativo UI | Correspondencia funcional sin copia visual |
+| 9:00–9:40 | 14. Evidencias | Material real disponible y ausencias declaradas |
+| 9:40–10:20 | 15. Resultados | 29 Cumple, 5 Parcial y 0 Falta |
+| 10:20–10:55 | 16. Conclusión | Aprendizaje y valor profesional |
 
-Si solo hay ocho minutos, conservar la apertura, el alcance ético, el modelo, la demo de tarea–entrega–calificación, seguridad y conclusión. Si hay doce minutos, añadir la vista de miembros, un comentario y la matriz OWASP.
+Si solo hay ocho minutos, conservar la apertura, el alcance ético, el modelo, la demo de tarea–entrega–calificación, seguridad y conclusión. Si hay doce minutos, añadir la vista de miembros, un comentario y la matriz OWASP. Los tiempos de los apartados orales siguientes sirven como guion ampliado; la secuencia oficial diapositiva por diapositiva es la tabla anterior y el [documento 30](30-presentacion-final-print.md).
 
 ## 12.3 Guion literal para exponer
 
@@ -75,7 +79,7 @@ Si solo hay ocho minutos, conservar la apertura, el alcance ético, el modelo, l
 
 ### 2:25–3:05 — Google Classroom como referencia observada
 
-**Mostrar:** una captura propia y anonimizada o, si no está disponible, el diagrama de flujos de `docs/02-analisis-google-classroom.md`.
+**Mostrar:** una captura propia autorizada de Classroom en su resolución original. No se modifica ni censura; si contiene un secreto reutilizable, se excluye de la proyección y se usa otra evidencia disponible.
 
 **Decir:**
 
@@ -167,7 +171,7 @@ Usar dos perfiles de navegador: uno para profesor y otro para estudiante. Prepar
 
 ## 12.6 Comparativo, resultados y limitaciones — 9:05–9:45
 
-**Mostrar:** un par visual autorizado: Classroom anonimizado a la izquierda y EduRoom desde Render a la derecha.
+**Mostrar:** un par visual autorizado: Classroom en su resolución original, sin modificación, a la izquierda y EduRoom desde Render a la derecha.
 
 **Decir:**
 
@@ -201,7 +205,7 @@ Usar dos perfiles de navegador: uno para profesor y otro para estudiante. Prepar
 - [ ] Ejecutar `npm test`, `npm run integrity:verify` y revisar que no se proyecten secretos.
 - [ ] Preparar una versión local con `docker compose up --build -d` y `docker compose exec backend npm run prisma:seed`.
 - [ ] Exportar las diapositivas y los documentos esenciales a PDF para uso sin conexión.
-- [ ] Guardar en local las capturas de `evidence/ui/eduroom/` y las capturas autorizadas y anonimizadas de Classroom.
+- [ ] Guardar en local las capturas de `evidence/ui/eduroom/` y los originales autorizados de Classroom, sin modificarlos ni censurarlos.
 - [ ] Crear o validar dos cuentas temporales de Render con datos sintéticos; no publicar sus contraseñas.
 - [ ] Preparar un curso de respaldo ya configurado, sin sustituir el curso que se creará durante la demo.
 - [ ] Verificar cable, adaptador, resolución del proyector y fuentes.
@@ -219,18 +223,18 @@ Usar dos perfiles de navegador: uno para profesor y otro para estudiante. Prepar
 
 ### Justo antes de proyectar
 
-- [ ] Confirmar que no aparecen nombres, correos, fotos, códigos activos, JWT ni datos personales.
+- [ ] Confirmar que no aparecen contraseñas, JWT completos, cookies, claves, cadenas de conexión o secretos reutilizables. Nombres, avatares, URL, identificadores y códigos controlados del alumno están autorizados.
 - [ ] Empezar en la portada, no en el escritorio ni en la consola.
 - [ ] Tener el código del curso temporal disponible fuera de la pantalla proyectada.
 - [ ] Recordar la frase: “observación e inferencia, no acceso a la implementación propietaria”.
 
 ## 12.10 Orden de ventanas y pestañas
 
-1. **Ventana 1 — Presentación:** `docs/19-presentacion-diapositivas.md` o su PDF, en pantalla completa.
+1. **Ventana 1 — Presentación:** `docs/30-presentacion-final-print.md` o su PDF, en pantalla completa.
 2. **Ventana 2 — Profesor:** perfil exclusivo con el dashboard de EduRoom.
 3. **Ventana 3 — Estudiante:** perfil distinto o ventana privada.
 4. **Ventana 4 — Estado público:** pestañas de `/api/health` y `/api/security/integrity`.
-5. **Ventana 5 — Evidencias:** comparativo visual y capturas anonimizadas.
+5. **Ventana 5 — Evidencias:** comparativo visual y capturas originales autorizadas.
 6. **Ventana 6 — GitHub o editor:** reporte final y esquema Prisma.
 7. **Ventana 7 — Plan B local:** `http://localhost:3000` y una terminal con Docker saludable.
 
@@ -266,3 +270,53 @@ npm run integrity:verify
 ## 12.13 Regla de cierre
 
 No terminar en una consola ni en una limitación. Volver a la diapositiva final y cerrar con el vínculo entre observación ética, construcción independiente, protección y evidencia verificable.
+
+## 12.14 Checklist operativo de exposición
+
+### Archivos y servicios
+
+- [ ] Abrir EduRoom en Render y despertar el servicio con una única consulta a `/api/health`.
+- [ ] Abrir GitHub en la raíz del repositorio y dejar preparada la carpeta `docs/`.
+- [ ] Abrir el reporte PDF final; si todavía no existe: **[PENDIENTE DE EXPORTACIÓN MANUAL]**.
+- [ ] Abrir la presentación PDF generada desde `docs/30-presentacion-final-print.md`; si todavía no existe: **[PENDIENTE DE EXPORTACIÓN MANUAL]**.
+- [ ] Abrir una terminal en la raíz con el comando E2E preparado, sin ejecutarlo repetidamente ni mostrar variables sensibles.
+- [ ] Tener listas las capturas autorizadas de Classroom, las seis dinámicas y la selección de EduRoom.
+- [ ] Tener el plan B local iniciado y verificado antes de proyectar.
+
+### Privacidad y autorización
+
+- [ ] Mantener sin modificación las capturas existentes de cuentas personales/controladas.
+- [ ] Aceptar nombres, avatares, URL, identificadores y códigos de clase controlados del alumno.
+- [ ] Excluir cualquier vista que revele contraseña, JWT completo, cookie, token privado, clave, variable de entorno o cadena de conexión.
+- [ ] Recordar la nota: “Las capturas visibles pertenecen a cuentas personales/controladas del alumno y se incluyen con autorización para fines académicos”.
+
+## 12.15 Plan B por incidente o pregunta
+
+| Situación | Respuesta operativa | Explicación breve |
+|---|---|---|
+| Render duerme | Mostrar la diapositiva 9 y las capturas de EduRoom; consultar `/api/health` una vez y continuar mientras despierta | “La instancia gratuita se reactiva; usaré evidencia local de la misma versión mientras responde” |
+| Falla internet | Usar presentación y reporte PDF locales, capturas y servicio Docker preparado | “La evidencia productiva está fechada; ahora demuestro el mismo flujo desde el respaldo local” |
+| Falla el login | No improvisar credenciales; cambiar a la cuenta de respaldo o recorrer login, curso, entrega y calificación mediante capturas | “El fallo de sesión no invalida el flujo previamente registrado; conservaré el incidente como limitación de la demo” |
+| El profesor pide ver código | Abrir `backend/src/server.ts`, una ruta con autorización, `backend/prisma/schema.prisma` o el script específico solicitado | “Distinguiré frontend, reglas del servidor y persistencia; no abriré `.env` ni paneles con secretos” |
+| Pide comprobar checksum | Ejecutar `npm run integrity:verify`; para detección controlada usar `npm run integrity:demo`, que modifica únicamente una copia temporal | “SHA-256 detecta diferencias respecto del manifest; no reemplaza firma digital ni control de despliegue” |
+| Pide explicar por qué no se vulneró Classroom | Mostrar metodología y alcance ético | “Se realizó observación manual de caja negra con cuentas controladas; no hubo bypass, explotación, automatización ni acceso a implementación interna” |
+| Pregunta por datos visibles en capturas | Citar la autorización y distinguir identidad controlada de secreto reutilizable | “Nombres, avatares, URL, IDs y códigos propios están autorizados; contraseñas, tokens y claves quedan fuera de la proyección” |
+
+## 12.16 Exportación y aceptación del PDF
+
+La fuente oficial es [30. Presentación final imprimible](30-presentacion-final-print.md). Desde la raíz:
+
+```bash
+npx @marp-team/marp-cli docs/30-presentacion-final-print.md --pdf --allow-local-files -o evidence/final-pdf/eduroom-presentacion-final.pdf
+```
+
+También puede usarse **Marp for VS Code → Export Slide Deck → PDF**. Después:
+
+1. confirmar exactamente 16 páginas en relación 16:9;
+2. revisar cada página al 100 % y comprobar que no haya recortes o deformaciones;
+3. comprobar que las imágenes locales estén incorporadas y que el PDF abra sin conexión;
+4. revisar nuevamente que no haya secretos reutilizables;
+5. calcular SHA-256 del PDF aprobado y registrarlo en `docs/13-evidencias.md`;
+6. ensayar 8–12 minutos y registrar fecha y duración.
+
+La documentación deja el material listo para exportar, pero no afirma que el PDF o la exposición existan hasta que el alumno complete y registre esas acciones manuales.

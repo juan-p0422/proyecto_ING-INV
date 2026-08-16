@@ -20,6 +20,12 @@ La codificación, minificación y hashing también son conceptos distintos. Base
 
 El navegador necesita recibir, interpretar y ejecutar HTML, CSS y JavaScript. Si el bundle estuviera cifrado de extremo a extremo, el cliente también tendría que recibir la clave y el procedimiento de descifrado. Un usuario con control de su navegador podría observar la clave, el código ya descifrado o su comportamiento en memoria.
 
+### 9.2.1 Consecuencia para el modelo de seguridad
+
+La observabilidad del cliente no se considera una falla de implementación: es una condición de la ejecución web. EduRoom no confía en que el bundle permanezca secreto. Las credenciales sensibles, la autorización por rol, la validación de entrada, el acceso a datos y las claves criptográficas se mantienen o comprueban en el servidor. La ofuscación solo aumenta el esfuerzo de lectura y la integridad permite detectar diferencias respecto de un artefacto aprobado.
+
+El alcance, los controles compensatorios y las mejoras futuras se desarrollan en [29. Limitaciones de protección del cliente web](29-limitaciones-proteccion-cliente-web.md).
+
 HTTPS cifra el **canal de transporte** entre servidor y navegador, pero el navegador legítimo obtiene el contenido en claro para ejecutarlo. Por esta razón, cifrar el JavaScript distribuido no crea una frontera duradera de confidencialidad. Los secretos y decisiones críticas nunca deben depender de que el bundle permanezca oculto.
 
 ## 9.3 Protección posible en el backend
@@ -117,7 +123,7 @@ La estrategia de EduRoom busca demostrar capas realistas sin presentar la ofusca
 1. **Separación de responsabilidades.** Toda autorización y acceso a datos se decide en Express; React solo representa el resultado.
 2. **Gestión de configuración.** El frontend recibe únicamente `VITE_API_URL`. Secretos, `DATABASE_URL` y `JWT_SECRET` permanecen en el backend.
 3. **Build de producción.** Vite agrupa y minifica React mediante `npm --prefix frontend run build`.
-4. **Build ofuscado opcional.** `npm --prefix frontend run build:obfuscated` procesa únicamente los archivos `.js` generados con `javascript-obfuscator`.
+4. **Build ofuscado reproducible.** `npm --prefix frontend run build:obfuscated` procesa únicamente los archivos `.js` generados con `javascript-obfuscator`; `npm run render:build` lo incorpora al candidato de Render.
 5. **Mapas de fuentes.** No se publican por defecto. Si se requieren para monitoreo, se almacenarán de forma privada y asociados al commit.
 6. **Contenedores multietapa.** La imagen final del frontend contiene archivos estáticos y Nginx; la del backend omite dependencias de desarrollo.
 7. **Integridad.** Se genera `integrity-manifest.json` después de la última transformación y se verifica mediante SHA-256.
@@ -139,7 +145,7 @@ HTML y CSS no se ofuscan. `npm run build:obfuscated` en la raíz compila backend
 
 Esta transformación **no es cifrado real**. El navegador recibe código ejecutable y una persona puede estudiarlo o reconstruirlo. Su finalidad es comparar artefactos, enseñar costes de legibilidad y reducir exposición casual; nunca se aplica a código de terceros.
 
-El despliegue declarado en `render.yaml`, `backend/Dockerfile` y `frontend/Dockerfile` usa actualmente `npm run build`, no el script ofuscado. Por tanto, la capacidad está implementada y comprobada localmente, pero no puede presentarse como activa en Render sin modificar la canalización, redesplegar y capturar evidencia del bundle resultante.
+La configuración de `render.yaml` ejecuta `npm run render:build`, que instala dependencias y delega en `release:educational`; `backend/Dockerfile` también genera el frontend ofuscado y crea el manifest después de la transformación. Express sirve `frontend/dist` de forma directa, por lo que no es necesario duplicarlo en `backend/public`. La capacidad no puede presentarse como activa en la URL pública hasta redesplegar el commit final y capturar evidencia del log, bundle y manifest resultantes. `frontend/Dockerfile` conserva el build normal para un servicio estático independiente y no es la imagen utilizada por el servicio unificado del Blueprint.
 
 ## 9.6 Procedimiento de verificación
 
@@ -149,7 +155,7 @@ El despliegue declarado en `render.yaml`, `backend/Dockerfile` y `frontend/Docke
 4. Ejecutar la aplicación contra la API propia y confirmar que alterar el estado local del cliente no concede permisos en el servidor.
 5. Revisar encabezados HTTP, tamaño del bundle y ausencia de mapas de fuentes públicos.
 6. Generar el manifiesto SHA-256 y conservar la evidencia de compilación.
-7. Ejecutar `npm run integrity:verify` y comprobar el estado resumido del dashboard.
+7. Ejecutar `npm run verify:integrity` y comprobar el estado resumido del dashboard.
 8. Crear una nota segura con una cuenta de prueba y registrar su identificador.
 9. Consultar `SecureNote.encryptedPayload` directamente en la base controlada y confirmar que el texto no aparece en claro.
 10. Recuperar la nota mediante `GET /api/security/secure-notes` usando el token de su propietario.
@@ -162,7 +168,8 @@ Pruebas automatizadas:
 ```bash
 npm --prefix backend test -- crypto.test.ts
 npm run build:obfuscated
-node scripts/verify-integrity.js
+npm run render:build
+npm run verify:integrity
 ```
 
 Las pruebas de `crypto.test.ts` comprueban ida y vuelta UTF-8, IV distinto para el mismo texto, rechazo de un ciphertext alterado y rechazo de material de clave insuficiente.
@@ -181,7 +188,7 @@ Las pruebas de `crypto.test.ts` comprueban ida y vuelta UTF-8, IV distinto para 
 
 > **Espacio de evidencia EV-09-07:** recuperación autorizada de la nota y prueba de aislamiento con un segundo usuario.
 
-## 9.7 Resultado de validación del 15-08-2026
+## 9.7 Resultado de validación del 16-08-2026
 
 | Mecanismo | Prueba | Resultado |
 |---|---|---|
@@ -191,7 +198,9 @@ Las pruebas de `crypto.test.ts` comprueban ida y vuelta UTF-8, IV distinto para 
 | Autenticación GCM | Ciphertext alterado | Descifrado rechazado |
 | Ofuscación | `npm run build:obfuscated` | Aprobada; 1 archivo JavaScript transformado |
 | Integridad post-ofuscación | Verificador CLI | 22/22 archivos coincidentes |
-| Render | Revisión de `render.yaml` | La ofuscación no forma parte del build declarado actual |
+| Pipeline candidato de Render | `npm run render:build` | Aprobado localmente; instalación limpia, build ofuscado y manifest 22/22; código 0 |
+| Sintaxis y regresión | `node --check` y `npm test` | Bundle válido; 10/10 backend y 2/2 frontend |
+| Deploy público | Evidencia de Render | Pendiente de redespliegue; no se atribuye aún la ofuscación a la URL pública |
 
 ## 9.8 Limitaciones reales
 
@@ -214,7 +223,7 @@ La meta razonable es reducir exposición accidental, preservar secretos del serv
 
 ## 9.9 Recomendaciones
 
-1. Incorporar el build ofuscado a una canalización de release separada y conservar el bundle y su manifest.
+1. Redesplegar el commit final con `npm run render:build` y conservar log, bundle y manifest del mismo build.
 2. Añadir versión de clave a cada payload y un procedimiento de rotación gradual.
 3. Usar un gestor de claves o secretos con auditoría y permisos mínimos.
 4. Considerar AAD para asociar el ciphertext con el propietario y el identificador lógico.
